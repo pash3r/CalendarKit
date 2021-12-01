@@ -63,35 +63,25 @@ public final class TimelineView: UIView {
 
   private lazy var nowLine: CurrentTimeIndicator = CurrentTimeIndicator()
   
-  private var allDayViewTopConstraint: NSLayoutConstraint?
-  private lazy var allDayView: AllDayView = {
-    let allDayView = AllDayView(frame: CGRect.zero)
-    
-    allDayView.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(allDayView)
-
-    self.allDayViewTopConstraint = allDayView.topAnchor.constraint(equalTo: topAnchor, constant: 0)
-    self.allDayViewTopConstraint?.isActive = true
-
-    allDayView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
-    allDayView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
-
-    return allDayView
-  }()
+    private var allDayViewTopConstraint: NSLayoutConstraint?
+    // WARNING!: -- remove after debug (delete because we don't use it)
+    private lazy var allDayView: AllDayView = {
+        AllDayView(frame: CGRect.zero)
+    }()
+    //
   
   var allDayViewHeight: CGFloat {
     return allDayView.bounds.height
   }
 
   var style = TimelineStyle()
-  private var horizontalEventInset: CGFloat = 3
 
   public var fullHeight: CGFloat {
     return style.verticalInset * 2 + style.verticalDiff * 24
   }
 
   public var calendarWidth: CGFloat {
-    return bounds.width - style.leadingInset
+    return bounds.width - style.leadingInset * 2
   }
     
   public private(set) var is24hClock = true {
@@ -283,7 +273,7 @@ public final class TimelineView: UIView {
                       NSAttributedString.Key.font: style.font] as [NSAttributedString.Key : Any]
 
     let scale = UIScreen.main.scale
-    let hourLineHeight = 1 / UIScreen.main.scale
+    let hourLineHeight = 1 / scale
 
     let center: CGFloat
     if Int(scale) % 2 == 0 {
@@ -293,31 +283,39 @@ public final class TimelineView: UIView {
     }
     
     let offset = 0.5 - center
+      
+      let rightToLeft = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft
+      let xEnd: CGFloat = {
+          if rightToLeft {
+              return 0
+          } else {
+              return bounds.width
+          }
+      }()
+      
+      let context = UIGraphicsGetCurrentContext()
+      context?.saveGState()
+//      context?.setFillColor(UIColor.green.cgColor)
+//      context?.fill(.init(origin: .init(x: style.leadingInset + 29, y: 0),
+//                          size: .init(width: calendarWidth, height: fullHeight)))
+//      context?.restoreGState()
     
     for (hour, time) in times.enumerated() {
-        let rightToLeft = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft
-        
         let hourFloat = CGFloat(hour)
-        let context = UIGraphicsGetCurrentContext()
-        context!.interpolationQuality = .none
+        let timeString = NSString(string: time)
+        let fontSize = style.font.pointSize
+        let timeSize = timeString.boundingRect(with: bounds.size,
+                                               options: .usesLineFragmentOrigin,
+                                               attributes: attributes,
+                                               context: nil)
+        
+        context?.interpolationQuality = .none
         context?.saveGState()
         context?.setStrokeColor(style.separatorColor.cgColor)
         context?.setLineWidth(hourLineHeight)
-        let xStart: CGFloat = {
-            if rightToLeft {
-                return bounds.width - 53
-            } else {
-                return 53
-            }
-        }()
-        let xEnd: CGFloat = {
-            if rightToLeft {
-                return 0
-            } else {
-                return bounds.width
-            }
-        }()
+        
         let y = style.verticalInset + hourFloat * style.verticalDiff + offset
+        let xStart = style.leadingInset + timeSize.width + style.separatorInset
         context?.beginPath()
         context?.move(to: CGPoint(x: xStart, y: y))
         context?.addLine(to: CGPoint(x: xEnd, y: y))
@@ -325,23 +323,26 @@ public final class TimelineView: UIView {
         context?.restoreGState()
     
         if hour == hourToRemoveIndex { continue }
-    
-        let fontSize = style.font.pointSize
+        
         let timeRect: CGRect = {
             var x: CGFloat
             if rightToLeft {
-                x = bounds.width - 53
+                x = bounds.width - style.leadingInset - timeSize.width
             } else {
-                x = 2
+                x = style.leadingInset
             }
             
             return CGRect(x: x,
                           y: hourFloat * style.verticalDiff + style.verticalInset - 7,
-                          width: style.leadingInset - 8,
+                          width: timeSize.width,
                           height: fontSize + 2)
         }()
-    
-        let timeString = NSString(string: time)
+        
+        context?.saveGState()
+        context?.setFillColor(UIColor.green.cgColor)
+        context?.fill(timeRect)
+        context?.restoreGState()
+        
         timeString.draw(in: timeRect, withAttributes: attributes)
     
         if accentedMinute == 0 {
@@ -365,6 +366,8 @@ public final class TimelineView: UIView {
             timeString.draw(in: timeRect, withAttributes: attributes)
         }
     }
+      
+      
   }
   
   // MARK: - Layout
@@ -488,8 +491,12 @@ public final class TimelineView: UIView {
         let startY = dateToY(event.descriptor.datePeriod.lowerBound)
         let endY = dateToY(event.descriptor.datePeriod.upperBound)
         let floatIndex = CGFloat(index)
-        let x = style.leadingInset + floatIndex / totalCount * calendarWidth
-        let equalWidth = calendarWidth / totalCount
+          // FIXME: leadingInset + 29 because originally it was 53. It lays out from
+          // left side but it doesn't take into account that time label
+          // also has some width. And for `equalWidth` (-5) because of
+          // the above + 29 :(
+        let x = style.leadingInset + 29 + floatIndex / totalCount * calendarWidth
+        let equalWidth = (calendarWidth - 5) / totalCount
         event.frame = CGRect(x: x, y: startY, width: equalWidth, height: endY - startY)
       }
     }

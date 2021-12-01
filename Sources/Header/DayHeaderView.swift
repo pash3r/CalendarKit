@@ -19,9 +19,7 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
 
   private var currentWeekdayIndex = -1
 
-  private var daySymbolsViewHeight: CGFloat = 20
-  private var pagingScrollViewHeight: CGFloat = 40
-  private var swipeLabelViewHeight: CGFloat = 20
+  private var pagingScrollViewHeight: CGFloat = 50
 
   private let daySymbolsView: DaySymbolsView
   private var pagingViewController = UIPageViewController(transitionStyle: .scroll,
@@ -44,24 +42,24 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
   }
 
   private func configure() {
-    [daySymbolsView, swipeLabelView].forEach(addSubview)
+    [daySymbolsView].forEach(addSubview)
     backgroundColor = style.backgroundColor
     configurePagingViewController()
   }
   
   private func configurePagingViewController() {
-    let selectedDate = Date()
-    let vc = makeSelectorController(startDate: beginningOfWeek(selectedDate))
-    vc.selectedDate = selectedDate
-    currentWeekdayIndex = vc.selectedIndex
-    
-    let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
-    let direction: UIPageViewController.NavigationDirection = leftToRight ? .forward : .reverse
-    
-    pagingViewController.setViewControllers([vc], direction: direction, animated: false, completion: nil)
-    pagingViewController.dataSource = self
-    pagingViewController.delegate = self
-    addSubview(pagingViewController.view!)
+      let selectedDate = Date()
+      let vc = makeSelectorController(startDate: beginningOfWeek(selectedDate))
+      vc.selectedDate = selectedDate
+      currentWeekdayIndex = vc.selectedIndex
+      
+      let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
+      let direction: UIPageViewController.NavigationDirection = leftToRight ? .forward : .reverse
+      
+      pagingViewController.setViewControllers([vc], direction: direction, animated: false, completion: nil)
+      pagingViewController.dataSource = self
+      pagingViewController.delegate = self
+      addSubview(pagingViewController.view!)
   }
   
   private func makeSelectorController(startDate: Date) -> DaySelectorController {
@@ -95,15 +93,11 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
     backgroundColor = style.backgroundColor
   }
 
-  override public func layoutSubviews() {
-    super.layoutSubviews()
-    daySymbolsView.frame = CGRect(origin: .zero,
-                                  size: CGSize(width: bounds.width, height: daySymbolsViewHeight))
-    pagingViewController.view?.frame = CGRect(origin: CGPoint(x: 0, y: daySymbolsViewHeight),
-                                              size: CGSize(width: bounds.width, height: pagingScrollViewHeight))
-    swipeLabelView.frame = CGRect(origin: CGPoint(x: 0, y: bounds.height - 10 - swipeLabelViewHeight),
-                                  size: CGSize(width: bounds.width, height: swipeLabelViewHeight))
-  }
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        pagingViewController.view?.frame = CGRect(origin: .zero,
+                                                  size: CGSize(width: bounds.width, height: pagingScrollViewHeight))
+    }
 
   public func transitionToHorizontalSizeClass(_ sizeClass: UIUserInterfaceSizeClass) {
     currentSizeClass = sizeClass
@@ -155,21 +149,48 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
 
   // MARK: UIPageViewControllerDataSource
 
-  public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-    if let selector = viewController as? DaySelectorController {
-      let previousDate = calendar.date(byAdding: .weekOfYear, value: -1, to: selector.startDate)!
-      return makeSelectorController(startDate: previousDate)
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        guard let selector = viewController as? DaySelectorController else {
+            return nil
+        }
+        
+        guard let startDate = state?.startDate else {
+            let previousDate = calendar.date(byAdding: .weekOfYear, value: -1, to: selector.startDate)!
+            return makeSelectorController(startDate: previousDate)
+        }
+        
+        let currentControllerDate = selector.startDate
+        if currentControllerDate == startDate {
+            return nil
+        }
+        
+        if currentControllerDate > startDate, let prevDate = calendar.date(byAdding: .weekOfYear, value: -1, to: currentControllerDate) {
+            return makeSelectorController(startDate: prevDate)
+        }
+          
+        return nil
     }
-    return nil
-  }
 
-  public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-    if let selector = viewController as? DaySelectorController {
-      let nextDate = calendar.date(byAdding: .weekOfYear, value: 1, to: selector.startDate)!
-      return makeSelectorController(startDate: nextDate)
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        guard let selector = viewController as? DaySelectorController else {
+            return nil
+        }
+        
+        let currentControllerDate = selector.startDate
+        
+        guard let endDate = state?.endDate else {
+            return makeSelectorController(startDate: calendar.date(byAdding: .weekOfYear, value: 1, to: currentControllerDate)!)
+        }
+        
+        var nextController: UIViewController?
+        
+        let result = calendar.compare(currentControllerDate, to: endDate, toGranularity: .weekOfYear)
+        if case .orderedAscending = result, let nextDate = calendar.date(byAdding: .weekOfYear, value: 1, to: currentControllerDate) {
+            nextController = makeSelectorController(startDate: nextDate)
+        }
+        
+        return nextController
     }
-    return nil
-  }
 
   // MARK: UIPageViewControllerDelegate
 

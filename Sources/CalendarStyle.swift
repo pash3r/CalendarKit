@@ -27,21 +27,23 @@ public struct DayHeaderStyle {
 }
 
 public struct DaySelectorStyle {
-  public var activeTextColor = SystemColors.systemBackground
-  public var selectedBackgroundColor = SystemColors.label
-
-  public var weekendTextColor = SystemColors.secondaryLabel
-  public var inactiveTextColor = SystemColors.label
-  public var inactiveBackgroundColor = UIColor.clear
-
-  public var todayInactiveTextColor = SystemColors.systemRed
-  public var todayActiveTextColor = UIColor.white
-  public var todayActiveBackgroundColor = SystemColors.systemRed
+    public var activeTextColor = SystemColors.systemBackground
+    public var selectedBackgroundColor = SystemColors.label
     
-  public var font = UIFont.systemFont(ofSize: 18)
-  public var todayFont = UIFont.boldSystemFont(ofSize: 18)
-  
-  public init() {}
+//    public var normalBgColor = UIColor.secondarySystemGroupedBackground
+    
+    public var weekendTextColor = SystemColors.secondaryLabel
+    public var inactiveTextColor = SystemColors.label
+    public var inactiveBackgroundColor = UIColor.clear
+    
+    public var todayInactiveTextColor = SystemColors.systemRed
+    public var todayActiveTextColor = UIColor.white
+    public var todayActiveBackgroundColor = SystemColors.systemRed
+    
+    public var font = UIFont.systemFont(ofSize: 18)
+    public var todayFont = UIFont.boldSystemFont(ofSize: 18)
+    
+    public init() {}
 }
 
 public struct DaySymbolsStyle {
@@ -58,27 +60,28 @@ public struct SwipeLabelStyle {
 }
 
 public struct TimelineStyle {
-  public var allDayStyle = AllDayViewStyle()
-  public var timeIndicator = CurrentTimeIndicatorStyle()
-  public var timeColor = SystemColors.secondaryLabel
-  public var separatorColor = SystemColors.systemSeparator
-  public var backgroundColor = SystemColors.systemBackground
-  public var font = UIFont.boldSystemFont(ofSize: 11)
-  public var dateStyle : DateStyle = .system
-  public var eventsWillOverlap: Bool = false
-  public var minimumEventDurationInMinutesWhileEditing: Int = 30
-  public var splitMinuteInterval: Int = 15
-  public var verticalDiff: CGFloat = 50
-  public var verticalInset: CGFloat = 10
-  public var leadingInset: CGFloat = 53
-  public var eventGap: CGFloat = 0
-  public init() {}
+    public var allDayStyle = AllDayViewStyle()
+    public var timeIndicator = CurrentTimeIndicatorStyle()
+    public var timeColor = SystemColors.secondaryLabel
+    public var separatorColor = SystemColors.systemSeparator
+    public var backgroundColor = SystemColors.systemBackground
+    public var font = UIFont.boldSystemFont(ofSize: 11)
+    public var dateStyle : DateStyle = .twentyFourHour
+    public var eventsWillOverlap: Bool = false
+    public var minimumEventDurationInMinutesWhileEditing: Int = 30
+    public var splitMinuteInterval: Int = 15
+    public var verticalDiff: CGFloat = 50
+    public var verticalInset: CGFloat = 10
+    public var leadingInset: CGFloat = 24
+    public var eventGap: CGFloat = 0
+    public var separatorInset: CGFloat = 15
+    public init() {}
 }
 
 public struct CurrentTimeIndicatorStyle {
   public var color = SystemColors.systemRed
   public var font = UIFont.systemFont(ofSize: 11)
-  public var dateStyle : DateStyle = .system
+  public var dateStyle : DateStyle = .twentyFourHour
   public init() {}
 }
 

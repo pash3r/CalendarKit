@@ -34,7 +34,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
   var style = DaySelectorStyle()
 
   override public var intrinsicContentSize: CGSize {
-    return CGSize(width: 75, height: 35)
+    return CGSize(width: 40, height: 50)
   }
 
   override init(frame: CGRect) {
@@ -48,8 +48,27 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
   }
 
   private func configure() {
-    clipsToBounds = true
-    [dayLabel, dateLabel].forEach(addSubview(_:))
+      // WARNING!: -- remove after debug
+      layer.borderColor = UIColor.red.cgColor
+      layer.borderWidth = 1
+      //
+      clipsToBounds = true
+      [dayLabel, dateLabel].forEach {
+          addSubview($0)
+          $0.translatesAutoresizingMaskIntoConstraints = false
+      }
+      
+      NSLayoutConstraint.activate([
+        dayLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 4),
+        dayLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+        dateLabel.topAnchor.constraint(equalTo: dayLabel.bottomAnchor, constant: 2),
+        dateLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+        dateLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor)
+      ])
+      
+      layer.cornerRadius = 6
+      
+      backgroundColor = .purple
   }
 
   public func updateStyle(_ newStyle: DaySelectorStyle) {
@@ -88,21 +107,6 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
     return false
   }
 
-  override public func layoutSubviews() {
-    super.layoutSubviews()
-    dayLabel.sizeToFit()
-    dayLabel.center.y = center.y
-    let interItemSpacing: CGFloat = selected ? 5 : 3
-    dateLabel.center.y = center.y
-    dateLabel.frame.origin.x = dayLabel.frame.maxX + interItemSpacing
-    dateLabel.frame.size = CGSize(width: 30, height: 30)
-
-    let freeSpace = bounds.width - (dateLabel.frame.origin.x + dateLabel.frame.width)
-    let padding = freeSpace / 2
-    [dayLabel, dateLabel].forEach { (label) in
-      label.frame.origin.x += padding
-    }
-  }
   override public func tintColorDidChange() {
     updateState()
   }

@@ -121,14 +121,14 @@ public final class DaySelector: UIView {
   override public func layoutSubviews() {
     super.layoutSubviews()
 
-    let itemCount = CGFloat(items.count)
-    let size = items.first?.intrinsicContentSize ?? .zero
+      let itemCount = CGFloat(items.count)
+      let size = CGSize(width: 40, height: 50) //items.first?.intrinsicContentSize ?? .zero
+      let minX: CGFloat = 24
+      let parentWidth = bounds.size.width - 2 * minX
 
-    let parentWidth = bounds.size.width
-
-    var per = parentWidth - size.width * itemCount
-    per /= itemCount
-    let minX = per / 2
+      var per = parentWidth - size.width * itemCount
+      per /= itemCount - 1
+      
 
     for (i, item) in items.enumerated() {
         
@@ -148,12 +148,12 @@ public final class DaySelector: UIView {
   }
 
   public func transitionToHorizontalSizeClass(_ sizeClass: UIUserInterfaceSizeClass) {
-    switch sizeClass {
-    case .regular:
+//    switch sizeClass {
+//    case .regular:
       initializeViews(viewType: DayDateCell.self)
-    default:
-      initializeViews(viewType: DateLabel.self)
-    }
+//    default:
+//      initializeViews(viewType: DateLabel.self)
+//    }
   }
 
   @objc private func dateLabelDidTap(_ sender: UITapGestureRecognizer) {

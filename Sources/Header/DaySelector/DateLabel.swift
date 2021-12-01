@@ -26,10 +26,6 @@ public final class DateLabel: UILabel, DaySelectorItemProtocol {
 
   private var style = DaySelectorStyle()
 
-  override public var intrinsicContentSize: CGSize {
-    return CGSize(width: 35, height: 35)
-  }
-
   override init(frame: CGRect) {
     super.init(frame: frame)
     configure()
@@ -52,18 +48,18 @@ public final class DateLabel: UILabel, DaySelectorItemProtocol {
   }
 
   func updateState() {
-    text = String(component(component: .day, from: date))
-    let today = isToday
-    if selected {
-      font = style.todayFont
-      textColor = today ? style.todayActiveTextColor : style.activeTextColor
-      backgroundColor = today ? style.todayActiveBackgroundColor : style.selectedBackgroundColor
-    } else {
-      let notTodayColor = isAWeekend(date: date) ? style.weekendTextColor : style.inactiveTextColor
-      font = style.font
-      textColor = today ? style.todayInactiveTextColor : notTodayColor
-      backgroundColor = style.inactiveBackgroundColor
-    }
+//    text = String(component(component: .day, from: date))
+//    let today = isToday
+//    if selected {
+//      font = style.todayFont
+//      textColor = today ? style.todayActiveTextColor : style.activeTextColor
+//      backgroundColor = today ? style.todayActiveBackgroundColor : style.selectedBackgroundColor
+//    } else {
+//      let notTodayColor = isAWeekend(date: date) ? style.weekendTextColor : style.inactiveTextColor
+//      font = style.font
+//      textColor = today ? style.todayInactiveTextColor : notTodayColor
+//      backgroundColor = style.inactiveBackgroundColor
+//    }
   }
 
   private func component(component: Calendar.Component, from date: Date) -> Int {

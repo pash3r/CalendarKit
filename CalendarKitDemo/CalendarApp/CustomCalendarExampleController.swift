@@ -58,6 +58,11 @@ class CustomCalendarExampleController: DayViewController {
 
     dayView = DayView(calendar: calendar)
     view = dayView
+    
+    var style = CalendarStyle()
+    style.timeline.dateStyle = .twentyFourHour
+    style.timeline.leadingInset = 24
+    dayView.updateStyle(style)
   }
   
   override func viewDidLoad() {

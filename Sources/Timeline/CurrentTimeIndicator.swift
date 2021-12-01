@@ -1,7 +1,7 @@
 import UIKit
 
 @objc public final class CurrentTimeIndicator: UIView {
-  private let padding : CGFloat = 3
+  private let padding : CGFloat = 0
   private let leadingInset: CGFloat = 53
 
   public var calendar: Calendar = Calendar.autoupdatingCurrent {

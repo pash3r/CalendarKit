@@ -5,15 +5,23 @@ public protocol DayViewStateUpdating: AnyObject {
 }
 
 public final class DayViewState {
-  public private(set) var calendar: Calendar
-  public private(set) var selectedDate: Date
-  private var clients = [DayViewStateUpdating]()
+    public private(set) var calendar: Calendar
+    public private(set) var selectedDate: Date
+    public let startDate: Date?
+    public let endDate: Date?
+    
+    private var clients = [DayViewStateUpdating]()
 
-  public init(date: Date = Date(), calendar: Calendar = Calendar.autoupdatingCurrent) {
-    let date = date.dateOnly(calendar: calendar)
-    self.calendar = calendar
-    self.selectedDate = date
-  }
+    public init(date: Date = Date(),
+                calendar: Calendar = Calendar.autoupdatingCurrent,
+                startDate: Date? = nil,
+                endDate: Date? = nil) {
+        let date = date.dateOnly(calendar: calendar)
+        self.calendar = calendar
+        self.selectedDate = date
+        self.startDate = startDate
+        self.endDate = endDate
+    }
 
   public func move(to date: Date) {
     let date = date.dateOnly(calendar: calendar)
