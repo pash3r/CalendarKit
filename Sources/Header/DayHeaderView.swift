@@ -16,6 +16,17 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
       swipeLabelView.state = state
     }
   }
+    
+    public weak var dayModelDataSource: DayModelDataSource? {
+        get {
+            (pagingViewController.viewControllers?.first as? DaySelectorController)?.dayModelDataSource
+        }
+        set {
+            pagingViewController.viewControllers?
+                .compactMap { $0 as? DaySelectorController }
+                .forEach { $0.dayModelDataSource = newValue }
+        }
+    }
 
   private var currentWeekdayIndex = -1
 
@@ -62,15 +73,16 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
       addSubview(pagingViewController.view!)
   }
   
-  private func makeSelectorController(startDate: Date) -> DaySelectorController {
-    let new = DaySelectorController()
-    new.calendar = calendar
-    new.transitionToHorizontalSizeClass(currentSizeClass)
-    new.updateStyle(style.daySelector)
-    new.startDate = startDate
-    new.delegate = self
-    return new
-  }
+    private func makeSelectorController(startDate: Date) -> DaySelectorController {
+        let new = DaySelectorController()
+        new.calendar = calendar
+        new.transitionToHorizontalSizeClass(currentSizeClass)
+        new.updateStyle(style.daySelector)
+        new.startDate = startDate
+        new.delegate = self
+        new.dayModelDataSource = dayModelDataSource
+        return new
+    }
   
   private func beginningOfWeek(_ date: Date) -> Date {
     let weekOfYear = component(component: .weekOfYear, from: date)

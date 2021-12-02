@@ -1,6 +1,8 @@
 import UIKit
 
 public final class DateLabel: UILabel, DaySelectorItemProtocol {
+    public var dayModel: DayModelDescription?
+    
   public var calendar = Calendar.autoupdatingCurrent {
     didSet {
       updateState()
@@ -86,7 +88,5 @@ public final class DateLabel: UILabel, DaySelectorItemProtocol {
   override public func layoutSubviews() {
     layer.cornerRadius = bounds.height / 2
   }
-  override public func tintColorDidChange() {
-    updateState()
-  }
+    
 }

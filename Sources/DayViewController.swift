@@ -1,6 +1,19 @@
 import UIKit
 
-open class DayViewController: UIViewController, EventDataSource, DayViewDelegate {
+// WARNING!: -- remove after debug (move to separate file(s))
+public protocol DayModelDescription: AnyObject {
+    var startHour: Int { get }
+    var endHour: Int { get }    
+    var isBusyDay: Bool { get }
+}
+
+public protocol DayModelDataSource: AnyObject {
+    func dayModel(for date: Date) -> DayModelDescription
+}
+//
+
+
+open class DayViewController: UIViewController, EventDataSource, DayViewDelegate, DayModelDataSource {
   public lazy var dayView: DayView = DayView()
   public var dataSource: EventDataSource? {
     get {
@@ -19,6 +32,15 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
       dayView.delegate = value
     }
   }
+    
+    public weak var dayModelDataSource: DayModelDataSource? {
+        get {
+            dayView.dayModelDataSource
+        }
+        set {
+            dayView.dayModelDataSource = newValue
+        }
+    }
 
   public var calendar = Calendar.autoupdatingCurrent {
     didSet {
@@ -39,17 +61,18 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
     view = dayView
   }
 
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-    edgesForExtendedLayout = []
-    view.tintColor = SystemColors.systemRed
-    dataSource = self
-    delegate = self
-    dayView.reloadData()
-
-    let sizeClass = traitCollection.horizontalSizeClass
-    configureDayViewLayoutForHorizontalSizeClass(sizeClass)
-  }
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        edgesForExtendedLayout = []
+        view.tintColor = SystemColors.systemRed
+        dataSource = self
+        delegate = self
+        dayModelDataSource = self
+        dayView.reloadData()
+        
+        let sizeClass = traitCollection.horizontalSizeClass
+        configureDayViewLayoutForHorizontalSizeClass(sizeClass)
+    }
 
   open override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
@@ -125,4 +148,10 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
   open func endEventEditing() {
     dayView.endEventEditing()
   }
+    
+    // MARK: - DayModelDataSource
+    
+    open func dayModel(for date: Date) -> DayModelDescription {
+        fatalError("should be overridden")
+    }
 }

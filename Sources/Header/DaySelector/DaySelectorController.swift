@@ -47,6 +47,15 @@ public final class DaySelectorController: UIViewController {
       daySelector.selectedDate = newValue
     }
   }
+    
+    public weak var dayModelDataSource: DayModelDataSource? {
+        get {
+            daySelector.dayModelDataSource
+        }
+        set {
+            daySelector.dayModelDataSource = newValue
+        }
+    }
   
   override public func loadView() {
     view = daySelector

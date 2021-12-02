@@ -21,6 +21,15 @@ public class DayView: UIView, TimelinePagerViewDelegate {
       timelinePagerView.dataSource = value
     }
   }
+    
+    public weak var dayModelDataSource: DayModelDataSource? {
+        get {
+            dayHeaderView.dayModelDataSource
+        }
+        set {
+            dayHeaderView.dayModelDataSource = newValue
+        }
+    }
 
   public weak var delegate: DayViewDelegate?
 

@@ -1,10 +1,11 @@
 import UIKit
 
 public protocol DaySelectorItemProtocol: AnyObject {
-  var date: Date {get set}
-  var selected: Bool {get set}
-  var calendar: Calendar {get set}
-  func updateStyle(_ newStyle: DaySelectorStyle)
+    var date: Date { get set }
+    var selected: Bool { get set }
+    var calendar: Calendar { get set }
+    var dayModel: DayModelDescription? { get set }
+    func updateStyle(_ newStyle: DaySelectorStyle)
 }
 
 public protocol DaySelectorDelegate: AnyObject {
@@ -19,12 +20,19 @@ public final class DaySelector: UIView {
       updateItemsCalendar()
     }
   }
-
-  private func updateItemsCalendar() {
-    items.forEach { (item) in
-      item.calendar = calendar
+    
+    public weak var dayModelDataSource: DayModelDataSource? {
+        didSet {
+            updateItemsCalendar()
+        }
     }
-  }
+
+    private func updateItemsCalendar() {
+        items.forEach { (item) in
+            item.calendar = calendar
+            item.dayModel = dayModelDataSource?.dayModel(for: item.date)
+        }
+    }
 
   private var style = DaySelectorStyle()
 

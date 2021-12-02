@@ -1,7 +1,7 @@
 import UIKit
 
 public final class DayDateCell: UIView, DaySelectorItemProtocol {
-
+  
   private let dateLabel = DateLabel()
   private let dayLabel = UILabel()
 
@@ -22,14 +22,21 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
   }
 
 
-  public var selected: Bool {
-    get {
-      return dateLabel.selected
+    public var selected: Bool = false {
+        didSet {
+            configure(with: dayModel)
+        }
     }
-    set(value) {
-      dateLabel.selected = value
+    
+    public var dayModel: DayModelDescription? {
+        didSet {
+            guard dayModel != nil else {
+                return
+            }
+            
+            updateState()
+        }
     }
-  }
 
   var style = DaySelectorStyle()
 
@@ -48,14 +55,11 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
   }
 
   private func configure() {
-      // WARNING!: -- remove after debug
-      layer.borderColor = UIColor.red.cgColor
-      layer.borderWidth = 1
-      //
       clipsToBounds = true
       [dayLabel, dateLabel].forEach {
           addSubview($0)
           $0.translatesAutoresizingMaskIntoConstraints = false
+          $0.backgroundColor = .clear
       }
       
       NSLayoutConstraint.activate([
@@ -67,8 +71,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
       ])
       
       layer.cornerRadius = 6
-      
-      backgroundColor = .purple
+      layer.borderWidth = 1
   }
 
   public func updateStyle(_ newStyle: DaySelectorStyle) {
@@ -77,14 +80,15 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
     updateState()
   }
 
-  private func updateState() {
-    let isWeekend = isAWeekend(date: date)
-    dayLabel.font = UIFont.systemFont(ofSize: regularSizeClassFontSize)
-    dayLabel.textColor = isWeekend ? style.weekendTextColor : style.inactiveTextColor
-    dateLabel.updateState()
-    updateDayLabel()
-    setNeedsLayout()
-  }
+    private func updateState() {
+        let isWeekend = isAWeekend(date: date)
+        dayLabel.font = UIFont.systemFont(ofSize: regularSizeClassFontSize)
+        dayLabel.textColor = isWeekend ? style.weekendTextColor : style.inactiveTextColor
+        dateLabel.updateState()
+        updateDayLabel()
+        configure(with: dayModel)
+        setNeedsLayout()
+    }
 
   private func updateDayLabel() {
     let daySymbols = calendar.shortWeekdaySymbols
@@ -106,8 +110,32 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
     }
     return false
   }
+    
+    private func configure(with model: DayModelDescription?) {
+        guard let model = model else {
+            return
+        }
+        
+        let bgColor: UIColor
+        let textColor: UIColor
+        let borderColor: CGColor
 
-  override public func tintColorDidChange() {
-    updateState()
-  }
+        let isSelected = selected
+        if isSelected {
+            bgColor = style.selectedBgColor
+            textColor = style.selectedTextColor
+            borderColor = style.selectedBorderColor.cgColor
+        } else {
+            let isBusyDay = model.isBusyDay
+            bgColor = isBusyDay ? style.busyBgColor : style.emptyBgColor
+            textColor = isBusyDay ? style.busyTextColor : style.emptyTextColor
+            borderColor = (isBusyDay ? style.busyBorderColor : style.emptyBorderColor).cgColor
+        }
+        
+        backgroundColor = bgColor
+        dayLabel.textColor = textColor
+        dateLabel.textColor = dayLabel.textColor
+        layer.borderColor = borderColor
+    }
+    
 }

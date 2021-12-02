@@ -27,6 +27,16 @@ public struct DayHeaderStyle {
 }
 
 public struct DaySelectorStyle {
+    public var selectedBgColor = UIColor.purple
+    public var selectedTextColor = UIColor.white
+    public var selectedBorderColor = UIColor.clear
+    public var busyBgColor = UIColor.systemGray3
+    public var busyTextColor = UIColor.label
+    public var busyBorderColor = UIColor.clear
+    public var emptyBgColor = UIColor.systemGray6
+    public var emptyTextColor = UIColor.systemGray4
+    public var emptyBorderColor = UIColor.systemGray3
+    
     public var activeTextColor = SystemColors.systemBackground
     public var selectedBackgroundColor = SystemColors.label
     
