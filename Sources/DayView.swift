@@ -28,6 +28,7 @@ public class DayView: UIView, TimelinePagerViewDelegate {
         }
         set {
             dayHeaderView.dayModelDataSource = newValue
+            timelinePagerView.dayModelDataSource = newValue
         }
     }
 
@@ -80,28 +81,31 @@ public class DayView: UIView, TimelinePagerViewDelegate {
   }
 
   private var style = CalendarStyle()
-
-  public init(calendar: Calendar = Calendar(identifier: .iso8601)) {
-    self.calendar = calendar
-    self.dayHeaderView = DayHeaderView(calendar: calendar)
-    self.timelinePagerView = TimelinePagerView(calendar: calendar)
-    super.init(frame: .zero)
-    configure()
-  }
-
-  override public init(frame: CGRect) {
-    self.dayHeaderView = DayHeaderView(calendar: calendar)
-    self.timelinePagerView = TimelinePagerView(calendar: calendar)
-    super.init(frame: frame)
-    configure()
-  }
-
-  required public init?(coder aDecoder: NSCoder) {
-    self.dayHeaderView = DayHeaderView(calendar: calendar)
-    self.timelinePagerView = TimelinePagerView(calendar: calendar)
-    super.init(coder: aDecoder)
-    configure()
-  }
+    
+    public init(calendar: Calendar = Calendar(identifier: .iso8601)) {
+        self.calendar = calendar
+        self.dayHeaderView = DayHeaderView(calendar: calendar)
+        self.timelinePagerView = TimelinePagerView(calendar: calendar)
+        super.init(frame: .zero)
+        timelinePagerView.dayModelDataSource = dayModelDataSource
+        configure()
+    }
+    
+    override public init(frame: CGRect) {
+        self.dayHeaderView = DayHeaderView(calendar: calendar)
+        self.timelinePagerView = TimelinePagerView(calendar: calendar)
+        super.init(frame: frame)
+        timelinePagerView.dayModelDataSource = dayModelDataSource
+        configure()
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        self.dayHeaderView = DayHeaderView(calendar: calendar)
+        self.timelinePagerView = TimelinePagerView(calendar: calendar)
+        super.init(coder: aDecoder)
+        timelinePagerView.dayModelDataSource = dayModelDataSource
+        configure()
+    }
 
     private func configure() {
         addSubview(timelinePagerView)

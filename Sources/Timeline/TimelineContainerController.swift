@@ -2,7 +2,12 @@ import UIKit
 
 public final class TimelineContainerController: UIViewController {
   /// Content Offset to be set once the view size has been calculated
-  public var pendingContentOffset: CGPoint?
+    public var pendingContentOffset: CGPoint?
+    public weak var dayModelDataSource: DayModelDataSource? {
+        didSet {
+            timeline.dayModelDataSource = dayModelDataSource
+        }
+    }
   
   public lazy var timeline = TimelineView()
   public lazy var container: TimelineContainer = {

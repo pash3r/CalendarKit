@@ -1,12 +1,12 @@
 import UIKit
 
 public final class TimelineContainer: UIScrollView {
-  public let timeline: TimelineView
+    public let timeline: TimelineView
   
-  public init(_ timeline: TimelineView) {
-    self.timeline = timeline
-    super.init(frame: .zero)
-  }
+    public init(_ timeline: TimelineView) {
+        self.timeline = timeline
+        super.init(frame: .zero)
+    }
   
   required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -15,7 +15,7 @@ public final class TimelineContainer: UIScrollView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         
-        timeline.frame = CGRect(x: 0, y: 0, width: bounds.width, height: timeline.fullHeight)
+        timeline.frame = CGRect(x: 0, y: 0, width: bounds.width, height: timeline.fullHeight())
     }
   
   public func prepareForReuse() {

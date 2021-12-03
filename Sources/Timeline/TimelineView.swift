@@ -8,7 +8,17 @@ public protocol TimelineViewDelegate: AnyObject {
 }
 
 public final class TimelineView: UIView {
-  public weak var delegate: TimelineViewDelegate?
+    public weak var delegate: TimelineViewDelegate?
+    public weak var dayModelDataSource: DayModelDataSource? {
+        didSet {
+            guard dayModelDataSource != nil else {
+                return
+            }
+
+            setNeedsLayout()
+            setNeedsDisplay()
+        }
+    }
 
   public var date = Date() {
     didSet {
@@ -62,10 +72,6 @@ public final class TimelineView: UIView {
     
   var style = TimelineStyle()
 
-  public var fullHeight: CGFloat {
-    return style.verticalInset * 2 + style.verticalDiff * 24
-  }
-
   public var calendarWidth: CGFloat {
     return bounds.width
   }
@@ -118,7 +124,7 @@ public final class TimelineView: UIView {
   
   public init() {
     super.init(frame: .zero)
-    frame.size.height = fullHeight
+    frame.size.height = fullHeight()
     configure()
   }
 
@@ -143,6 +149,21 @@ public final class TimelineView: UIView {
     addGestureRecognizer(longPressGestureRecognizer)
     addGestureRecognizer(tapGestureRecognizer)
   }
+    
+    func fullHeight() -> CGFloat {
+        var totalHours = 24
+        
+        func height(for hours: Int) -> CGFloat {
+            return style.verticalInset * 2 + style.verticalDiff * CGFloat(hours)
+        }
+        
+        guard let dayModel = dayModelDataSource?.dayModel(for: date) else {
+            return height(for: totalHours)
+        }
+        
+        totalHours = dayModel.endHour - dayModel.startHour
+        return height(for: totalHours)
+    }
   
   // MARK: - Event Handling
   
@@ -260,6 +281,13 @@ public final class TimelineView: UIView {
 //                          size: .init(width: calendarWidth, height: fullHeight)))
 //      context?.restoreGState()
     
+      let times: [String]
+      if let dayModel = dayModelDataSource?.dayModel(for: date) {
+          times = TimeStringsFactory().make24hStrings(with: dayModel.startHour, endHour: dayModel.endHour)
+      } else {
+          times = self.times
+      }
+      
     for (hour, time) in times.enumerated() {
         let hourFloat = CGFloat(hour)
         let timeString = NSString(string: time)

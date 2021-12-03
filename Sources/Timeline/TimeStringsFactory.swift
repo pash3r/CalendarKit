@@ -38,4 +38,21 @@ struct TimeStringsFactory {
     pm.append(am.first!)
     return am + pm
   }
+    
+    func make24hStrings(with startHour: Int, endHour: Int) -> [String] {
+        guard (endHour - startHour) > 0 else {
+            return []
+        }
+        
+        var numbers = [String]()
+        
+        for i in startHour...endHour {
+          let i = i % 24
+          var string = i < 10 ? "0" + String(i) : String(i)
+          string.append(":00")
+          numbers.append(string)
+        }
+        
+        return numbers
+    }
 }
