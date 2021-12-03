@@ -36,11 +36,11 @@ public struct DaySelectorStyle {
     public var emptyBgColor = UIColor.systemGray6
     public var emptyTextColor = UIColor.systemGray4
     public var emptyBorderColor = UIColor.systemGray3
+    public var dayNameFont = UIFont.systemFont(ofSize: 12, weight: .regular)
+    public var dayNumberFont = UIFont.systemFont(ofSize: 14, weight: .medium)
     
     public var activeTextColor = SystemColors.systemBackground
     public var selectedBackgroundColor = SystemColors.label
-    
-//    public var normalBgColor = UIColor.secondarySystemGroupedBackground
     
     public var weekendTextColor = SystemColors.secondaryLabel
     public var inactiveTextColor = SystemColors.label
@@ -81,8 +81,9 @@ public struct TimelineStyle {
     public var minimumEventDurationInMinutesWhileEditing: Int = 30
     public var splitMinuteInterval: Int = 15
     public var verticalDiff: CGFloat = 50
-    public var verticalInset: CGFloat = 10
+    public var verticalInset: CGFloat = 32
     public var leadingInset: CGFloat = 24
+    public var trailingInset: CGFloat = 24
     public var eventGap: CGFloat = 0
     public var separatorInset: CGFloat = 15
     public init() {}

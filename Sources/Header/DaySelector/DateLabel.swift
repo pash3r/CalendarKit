@@ -84,9 +84,5 @@ public final class DateLabel: UILabel, DaySelectorItemProtocol {
                         self.updateState()
     }, completion: nil)
   }
-
-  override public func layoutSubviews() {
-    layer.cornerRadius = bounds.height / 2
-  }
     
 }

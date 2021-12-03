@@ -7,12 +7,12 @@ public final class Event: EventDescriptor {
   public var text = ""
   public var attributedText: NSAttributedString?
   public var lineBreakMode: NSLineBreakMode?
-  public var color = SystemColors.systemBlue {
+    public var color = UIColor.purple {
     didSet {
       updateColors()
     }
   }
-  public var backgroundColor = SystemColors.systemBlue.withAlphaComponent(0.3)
+    public var backgroundColor = UIColor.secondarySystemGroupedBackground
   public var textColor = SystemColors.label
   public var font = UIFont.boldSystemFont(ofSize: 12)
   public var userInfo: Any?
@@ -21,6 +21,8 @@ public final class Event: EventDescriptor {
       updateColors()
     }
   }
+    
+    public var lessonEvent: LessonEventProtocol?
 
   public init() {}
 

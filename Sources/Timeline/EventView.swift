@@ -5,16 +5,10 @@ open class EventView: UIView {
   public var color = SystemColors.label
 
   public var contentHeight: CGFloat {
-    return textView.frame.height
+    return lessonView.frame.height
   }
 
-  public lazy var textView: UITextView = {
-    let view = UITextView()
-    view.isUserInteractionEnabled = false
-    view.backgroundColor = .clear
-    view.isScrollEnabled = false
-    return view
-  }()
+    private let lessonView: LessonEventView = .init(frame: .zero)
 
   /// Resize Handle views showing up when editing the event.
   /// The top handle has a tag of `0` and the bottom has a tag of `1`
@@ -31,9 +25,10 @@ open class EventView: UIView {
   }
 
   private func configure() {
-    clipsToBounds = false
+      layer.cornerRadius = 6
+      layer.masksToBounds = true
     color = tintColor
-    addSubview(textView)
+    addSubview(lessonView)
     
     for (idx, handle) in eventResizeHandles.enumerated() {
       handle.tag = idx
@@ -42,16 +37,23 @@ open class EventView: UIView {
   }
 
   public func updateWithDescriptor(event: EventDescriptor) {
-    if let attributedText = event.attributedText {
-      textView.attributedText = attributedText
-    } else {
-      textView.text = event.text
-      textView.textColor = event.textColor
-      textView.font = event.font
-    }
-    if let lineBreakMode = event.lineBreakMode {
-      textView.textContainer.lineBreakMode = lineBreakMode
-    }
+      lessonView.nameLabel.text = event.lessonEvent?.name
+      lessonView.nameLabel.font = event.lessonEvent?.nameFont
+      lessonView.nameLabel.textColor = event.lessonEvent?.nameTextColor
+      lessonView.addressLabel.text = event.lessonEvent?.address
+      lessonView.addressLabel.font = event.lessonEvent?.addressFont
+      lessonView.addressLabel.textColor = event.lessonEvent?.addressTextColor
+      lessonView.imageView.image = event.lessonEvent?.avatar
+//    if let attributedText = event.attributedText {
+//      textView.attributedText = attributedText
+//    } else {
+//      textView.text = event.text
+//      textView.textColor = event.textColor
+//      textView.font = event.font
+//    }
+//    if let lineBreakMode = event.lineBreakMode {
+//      textView.textContainer.lineBreakMode = lineBreakMode
+//    }
     descriptor = event
     backgroundColor = event.backgroundColor
     color = event.color
@@ -103,8 +105,8 @@ open class EventView: UIView {
     context.interpolationQuality = .none
     context.saveGState()
     context.setStrokeColor(color.cgColor)
-    context.setLineWidth(3)
-    context.translateBy(x: 0, y: 0.5)
+    context.setLineWidth(Constants.leftStripeWidth * 2)
+//    context.translateBy(x: 0, y: 0.5)
     let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
     let x: CGFloat = leftToRight ? 0 : frame.width - 1  // 1 is the line width
     let y: CGFloat = 0
@@ -119,35 +121,37 @@ open class EventView: UIView {
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-    textView.frame = {
-        if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
-            return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
-        } else {
-            return CGRect(x: bounds.minX + 3, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
-        }
-    }()
-    if frame.minY < 0 {
-      var textFrame = textView.frame;
-      textFrame.origin.y = frame.minY * -1;
-      textFrame.size.height += frame.minY;
-      textView.frame = textFrame;
-    }
-    let first = eventResizeHandles.first
-    let last = eventResizeHandles.last
-    let radius: CGFloat = 40
-    let yPad: CGFloat =  -radius / 2
-    let width = bounds.width
-    let height = bounds.height
-    let size = CGSize(width: radius, height: radius)
-    first?.frame = CGRect(origin: CGPoint(x: width - radius - layoutMargins.right, y: yPad),
-                          size: size)
-    last?.frame = CGRect(origin: CGPoint(x: layoutMargins.left, y: height - yPad - radius),
-                         size: size)
-    
-    if drawsShadow {
-      applySketchShadow(alpha: 0.13,
-                        blur: 10)
-    }
+      
+      let stripeWidth = Constants.leftStripeWidth
+      lessonView.frame = {
+          if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
+              return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - stripeWidth, height: bounds.height)
+          } else {
+              return CGRect(x: bounds.minX + Constants.leftStripeWidth, y: bounds.minY, width: bounds.width - stripeWidth, height: bounds.height)
+          }
+      }()
+      if frame.minY < 0 {
+          var textFrame = lessonView.frame;
+          textFrame.origin.y = frame.minY * -1;
+          textFrame.size.height += frame.minY;
+          lessonView.frame = textFrame;
+      }
+      let first = eventResizeHandles.first
+      let last = eventResizeHandles.last
+      let radius: CGFloat = 40
+      let yPad: CGFloat =  -radius / 2
+      let width = bounds.width
+      let height = bounds.height
+      let size = CGSize(width: radius, height: radius)
+      first?.frame = CGRect(origin: CGPoint(x: width - radius - layoutMargins.right, y: yPad),
+                            size: size)
+      last?.frame = CGRect(origin: CGPoint(x: layoutMargins.left, y: height - yPad - radius),
+                           size: size)
+      
+      if drawsShadow {
+          applySketchShadow(alpha: 0.13,
+                            blur: 10)
+      }
   }
 
   private func applySketchShadow(
@@ -170,4 +174,81 @@ open class EventView: UIView {
       layer.shadowPath = UIBezierPath(rect: rect).cgPath
     }
   }
+    
+    private struct Constants {
+        static let leftStripeWidth: CGFloat = 4
+    }
+}
+
+private class LessonEventView: UIView {
+    
+    let addressLabel: UILabel = {
+        let result = UILabel()
+        result.translatesAutoresizingMaskIntoConstraints = false
+        return result
+    }()
+    
+    let nameLabel: UILabel = {
+        let result = UILabel()
+        result.translatesAutoresizingMaskIntoConstraints = false
+        return result
+    }()
+    
+    let imageView: UIImageView = {
+        let result = UIImageView()
+        result.translatesAutoresizingMaskIntoConstraints = false
+        return result
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configureSelf()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("\(#function) is not supported")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        imageView.layer.cornerRadius = imageView.frame.width / 2
+    }
+    
+    private func configureSelf() {
+        imageView.layer.masksToBounds = true
+        [addressLabel, nameLabel, imageView].forEach { self.addSubview($0) }
+        
+        let nameLabelBottomConstraint = nameLabel.bottomAnchor.constraint(lessThanOrEqualTo: self.bottomAnchor, constant: -Constants.bottomMargin)
+        nameLabelBottomConstraint.priority = .init(999)
+        
+        NSLayoutConstraint.activate([
+            addressLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: Constants.topMargin),
+            addressLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: Constants.horizontalMargin),
+            addressLabel.trailingAnchor.constraint(greaterThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
+            
+            imageView.topAnchor.constraint(equalTo: addressLabel.bottomAnchor, constant: Constants.imageTopMargin),
+            imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: Constants.horizontalMargin),
+            imageView.widthAnchor.constraint(equalToConstant: Constants.imageSideLength),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
+            
+            nameLabel.topAnchor.constraint(equalTo: addressLabel.bottomAnchor, constant: Constants.betweenLabelsMargin),
+            nameLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: Constants.imageRightMargin),
+            nameLabelBottomConstraint,
+            nameLabel.trailingAnchor.constraint(greaterThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
+        ])
+        
+        
+    }
+    
+    private struct Constants {
+        static let topMargin: CGFloat = 8
+        static let horizontalMargin: CGFloat = 16
+        static let bottomMargin: CGFloat = 13
+        static let betweenLabelsMargin: CGFloat = 7
+        static let imageTopMargin: CGFloat = 4
+        static let imageSideLength: CGFloat = 20
+        static let imageRightMargin: CGFloat = 8
+    }
+    
 }

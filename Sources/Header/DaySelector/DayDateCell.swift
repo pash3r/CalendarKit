@@ -64,11 +64,18 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
       
       NSLayoutConstraint.activate([
         dayLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 4),
+        dayLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor),
+        dayLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor),
         dayLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-        dateLabel.topAnchor.constraint(equalTo: dayLabel.bottomAnchor, constant: 2),
-        dateLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+        
+        dateLabel.topAnchor.constraint(equalTo: dayLabel.bottomAnchor),
+        dateLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor),
+        dateLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 4),
+        dateLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor),
         dateLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor)
       ])
+      
+//      dayLabel.setContentCompressionResistancePriority(.init(749), for: .vertical)
       
       layer.cornerRadius = 6
       layer.borderWidth = 1
@@ -81,9 +88,6 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
   }
 
     private func updateState() {
-        let isWeekend = isAWeekend(date: date)
-        dayLabel.font = UIFont.systemFont(ofSize: regularSizeClassFontSize)
-        dayLabel.textColor = isWeekend ? style.weekendTextColor : style.inactiveTextColor
         dateLabel.updateState()
         updateDayLabel()
         configure(with: dayModel)
@@ -133,7 +137,9 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
         }
         
         backgroundColor = bgColor
+        dayLabel.font = style.dayNameFont
         dayLabel.textColor = textColor
+        dateLabel.font = style.dayNumberFont
         dateLabel.textColor = dayLabel.textColor
         layer.borderColor = borderColor
     }

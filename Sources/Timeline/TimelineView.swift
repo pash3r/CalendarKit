@@ -41,9 +41,6 @@ public final class TimelineView: UIView {
       
       recalculateEventLayout()
       prepareEventViews()
-      allDayView.events = allDayLayoutAttributes.map { $0.descriptor }
-      allDayView.isHidden = allDayLayoutAttributes.count == 0
-      allDayView.scrollToBottom()
       
       setNeedsLayout()
     }
@@ -62,18 +59,7 @@ public final class TimelineView: UIView {
   }
 
   private lazy var nowLine: CurrentTimeIndicator = CurrentTimeIndicator()
-  
-    private var allDayViewTopConstraint: NSLayoutConstraint?
-    // WARNING!: -- remove after debug (delete because we don't use it)
-    private lazy var allDayView: AllDayView = {
-        AllDayView(frame: CGRect.zero)
-    }()
-    //
-  
-  var allDayViewHeight: CGFloat {
-    return allDayView.bounds.height
-  }
-
+    
   var style = TimelineStyle()
 
   public var fullHeight: CGFloat {
@@ -81,7 +67,7 @@ public final class TimelineView: UIView {
   }
 
   public var calendarWidth: CGFloat {
-    return bounds.width - style.leadingInset * 2
+    return bounds.width
   }
     
   public private(set) var is24hClock = true {
@@ -151,7 +137,7 @@ public final class TimelineView: UIView {
     layer.contentsScale = 1
     contentMode = .redraw
     backgroundColor = .white
-    addSubview(nowLine)
+//    addSubview(nowLine)
     
     // Add long press gesture recognizer
     addGestureRecognizer(longPressGestureRecognizer)
@@ -182,13 +168,6 @@ public final class TimelineView: UIView {
   }
   
   private func findEventView(at point: CGPoint) -> EventView? {
-    for eventView in allDayView.eventViews {
-      let frame = eventView.convert(eventView.bounds, to: self)
-      if frame.contains(point) {
-        return eventView
-      }
-    }
-
     for eventView in eventViews {
       let frame = eventView.frame
       if frame.contains(point) {
@@ -198,29 +177,10 @@ public final class TimelineView: UIView {
     return nil
   }
   
-  
-  /**
-   Custom implementation of the hitTest method is needed for the tap gesture recognizers
-   located in the AllDayView to work.
-   Since the AllDayView could be outside of the Timeline's bounds, the touches to the EventViews
-   are ignored.
-   In the custom implementation the method is recursively invoked for all of the subviews,
-   regardless of their position in relation to the Timeline's bounds.
-   */
-  public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    for subview in allDayView.subviews {
-      if let subSubView = subview.hitTest(convert(point, to: subview), with: event) {
-        return subSubView
-      }
-    }
-    return super.hitTest(point, with: event)
-  }
-  
   // MARK: - Style
 
   public func updateStyle(_ newStyle: TimelineStyle) {
     style = newStyle
-    allDayView.updateStyle(style.allDayStyle)
     nowLine.updateStyle(style.timeIndicator)
     
     switch style.dateStyle {
@@ -248,20 +208,20 @@ public final class TimelineView: UIView {
     var accentedHour = -1
     var accentedMinute = -1
 
-    if let accentedDate = accentedDate {
-      accentedHour = eventEditingSnappingBehavior.accentedHour(for: accentedDate)
-      accentedMinute = eventEditingSnappingBehavior.accentedMinute(for: accentedDate)
-    }
-
-    if isToday {
-      let minute = component(component: .minute, from: currentTime)
-      let hour = component(component: .hour, from: currentTime)
-      if minute > 39 {
-        hourToRemoveIndex = hour + 1
-      } else if minute < 21 {
-        hourToRemoveIndex = hour
-      }
-    }
+//    if let accentedDate = accentedDate {
+//      accentedHour = eventEditingSnappingBehavior.accentedHour(for: accentedDate)
+//      accentedMinute = eventEditingSnappingBehavior.accentedMinute(for: accentedDate)
+//    }
+//
+//    if isToday {
+//      let minute = component(component: .minute, from: currentTime)
+//      let hour = component(component: .hour, from: currentTime)
+//      if minute > 39 {
+//        hourToRemoveIndex = hour + 1
+//      } else if minute < 21 {
+//        hourToRemoveIndex = hour
+//      }
+//    }
 
     let mutableParagraphStyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
     mutableParagraphStyle.lineBreakMode = .byWordWrapping
@@ -289,7 +249,7 @@ public final class TimelineView: UIView {
           if rightToLeft {
               return 0
           } else {
-              return bounds.width
+              return bounds.width - style.trailingInset
           }
       }()
       
@@ -338,11 +298,6 @@ public final class TimelineView: UIView {
                           height: fontSize + 2)
         }()
         
-        context?.saveGState()
-        context?.setFillColor(UIColor.green.cgColor)
-        context?.fill(timeRect)
-        context?.restoreGState()
-        
         timeString.draw(in: timeRect, withAttributes: attributes)
     
         if accentedMinute == 0 {
@@ -376,8 +331,7 @@ public final class TimelineView: UIView {
     super.layoutSubviews()
     recalculateEventLayout()
     layoutEvents()
-    layoutNowLine()
-    layoutAllDayEvents()
+//    layoutNowLine()
   }
 
   private func layoutNowLine() {
@@ -411,30 +365,13 @@ public final class TimelineView: UIView {
         
       eventView.frame = CGRect(x: x,
                                y: attributes.frame.minY,
-                               width: attributes.frame.width - style.eventGap,
+                               width: attributes.frame.width,
                                height: attributes.frame.height - style.eventGap)
       eventView.updateWithDescriptor(event: descriptor)
     }
   }
-  
-  private func layoutAllDayEvents() {
-    //add day view needs to be in front of the nowLine
-    bringSubviewToFront(allDayView)
-  }
-  
-  /**
-   This will keep the allDayView as a staionary view in its superview
-   
-   - parameter yValue: since the superview is a scrollView, `yValue` is the
-   `contentOffset.y` of the scroll view
-   */
-  public func offsetAllDayView(by yValue: CGFloat) {
-    if let topConstraint = self.allDayViewTopConstraint {
-      topConstraint.constant = yValue
-      layoutIfNeeded()
-    }
-  }
-
+    
+    
   private func recalculateEventLayout() {
 
     // only non allDay events need their frames to be set
@@ -484,22 +421,22 @@ public final class TimelineView: UIView {
 
     groupsOfEvents.append(overlappingEvents)
     overlappingEvents.removeAll()
-
-    for overlappingEvents in groupsOfEvents {
-      let totalCount = CGFloat(overlappingEvents.count)
-      for (index, event) in overlappingEvents.enumerated() {
-        let startY = dateToY(event.descriptor.datePeriod.lowerBound)
-        let endY = dateToY(event.descriptor.datePeriod.upperBound)
-        let floatIndex = CGFloat(index)
-          // FIXME: leadingInset + 29 because originally it was 53. It lays out from
-          // left side but it doesn't take into account that time label
-          // also has some width. And for `equalWidth` (-5) because of
-          // the above + 29 :(
-        let x = style.leadingInset + 29 + floatIndex / totalCount * calendarWidth
-        let equalWidth = (calendarWidth - 5) / totalCount
-        event.frame = CGRect(x: x, y: startY, width: equalWidth, height: endY - startY)
+      
+      for overlappingEvents in groupsOfEvents {
+          let totalCount = CGFloat(overlappingEvents.count)
+          for (index, event) in overlappingEvents.enumerated() {
+              let startY = dateToY(event.descriptor.datePeriod.lowerBound)
+              let endY = dateToY(event.descriptor.datePeriod.upperBound)
+              let floatIndex = CGFloat(index)
+              // FIXME: leadingInset + 29 because originally it was 53. It lays out from
+              // left side but it doesn't take into account that time label
+              // also has some width. And for `equalWidth` (-5) because of
+              // the above + 29 :(
+              let x = style.leadingInset + 32 + style.separatorInset + floatIndex / totalCount * calendarWidth
+              let equalWidth = (calendarWidth - x - style.trailingInset) / totalCount
+              event.frame = CGRect(x: x, y: startY, width: equalWidth, height: endY - startY)
+          }
       }
-    }
   }
 
   private func prepareEventViews() {
