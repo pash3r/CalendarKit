@@ -75,8 +75,6 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
         dateLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor)
       ])
       
-//      dayLabel.setContentCompressionResistancePriority(.init(749), for: .vertical)
-      
       layer.cornerRadius = 6
       layer.borderWidth = 1
   }

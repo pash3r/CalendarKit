@@ -1,6 +1,6 @@
 import Foundation
 
-extension Date {
+public extension Date {
   func dateOnly(calendar: Calendar) -> Date {
     let yearComponent = calendar.component(.year, from: self)
     let monthComponent = calendar.component(.month, from: self)
@@ -14,4 +14,9 @@ extension Date {
     let returnValue = calendar.date(from: newComponents)
     return returnValue!
   }
+    
+    func isEqualWithoutTime(to anotherDate: Date, calendar: Calendar) -> Bool {
+        let comparison = calendar.compare(self, to: anotherDate, toGranularity: .weekday)
+        return comparison == .orderedSame
+    }
 }

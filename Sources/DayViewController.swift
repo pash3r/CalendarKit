@@ -66,8 +66,7 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
         edgesForExtendedLayout = []
         view.tintColor = SystemColors.systemRed
         dataSource = self
-        delegate = self
-        dayModelDataSource = self
+        delegate = self        
         dayView.reloadData()
         
         let sizeClass = traitCollection.horizontalSizeClass
