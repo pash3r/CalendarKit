@@ -16,7 +16,6 @@ public final class TimelineView: UIView {
             }
 
             setNeedsLayout()
-            setNeedsDisplay()
         }
     }
 
@@ -161,8 +160,7 @@ public final class TimelineView: UIView {
             return height(for: totalHours)
         }
         
-        totalHours = dayModel.endHour - dayModel.startHour
-        return height(for: totalHours)
+        return height(for: dayModel.totalWorkingHours)
     }
   
   // MARK: - Event Handling
@@ -396,6 +394,12 @@ public final class TimelineView: UIView {
                                width: attributes.frame.width,
                                height: attributes.frame.height - style.eventGap)
       eventView.updateWithDescriptor(event: descriptor)
+        
+        let eventMinY = attributes.frame.minY
+        let isHidden = (eventMinY < 0) || (eventMinY > fullHeight())
+        // WARNING!: -- remove after debug (set isHidden to eventView)
+//        eventView.isHidden = isHidden
+        //
     }
   }
     
@@ -498,14 +502,27 @@ public final class TimelineView: UIView {
       // Event starting the previous day
       dayOffset -= 1
     }
-    let fullTimelineHeight = 24 * style.verticalDiff
+      
+      let verticalDiff = style.verticalDiff
+      let totalHours: CGFloat
+      let timeOffset: CGFloat // because day might not start from 00:00
+      if let model = dayModelDataSource?.dayModel(for: self.date) {
+          totalHours = CGFloat(model.totalWorkingHours)
+          timeOffset = -(CGFloat(model.startHour) * verticalDiff)
+      } else {
+          totalHours = 24
+          timeOffset = 0
+      }
+    let fullTimelineHeight = totalHours * style.verticalDiff
     let hour = component(component: .hour, from: date)
     let minute = component(component: .minute, from: date)
     let hourY = CGFloat(hour) * style.verticalDiff + style.verticalInset
     let minuteY = CGFloat(minute) * style.verticalDiff / 60
-    return hourY + minuteY + fullTimelineHeight * dayOffset
+    return timeOffset + hourY + minuteY + fullTimelineHeight * dayOffset
   }
 
+    // if we wanna support reordering etc
+    // here we should consider startOfTheDay delta
   public func yToDate(_ y: CGFloat) -> Date {
     let timeValue = y - style.verticalInset
     var hour = Int(timeValue / style.verticalDiff)

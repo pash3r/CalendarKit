@@ -5,6 +5,7 @@ public protocol DayModelDescription: AnyObject {
     var startHour: Int { get }
     var endHour: Int { get }    
     var isBusyDay: Bool { get }
+    var totalWorkingHours: Int { get }
 }
 
 public protocol DayModelDataSource: AnyObject {
