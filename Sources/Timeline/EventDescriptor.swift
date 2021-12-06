@@ -20,9 +20,11 @@ public protocol EventDescriptor: AnyObject {
 }
 
 public protocol LessonEventProtocol: AnyObject {
+    typealias AvatarSetter = (UIImageView) -> Void
+    
     var address: String { get }
     var name: String { get }
-    var avatar: UIImage { get }
+    var avatarClosure: AvatarSetter { get }
     var addressFont: UIFont { get }
     var addressTextColor: UIColor { get }
     var nameFont: UIFont { get }

@@ -36,35 +36,26 @@ open class EventView: UIView {
     }
   }
 
-  public func updateWithDescriptor(event: EventDescriptor) {
-      lessonView.nameLabel.text = event.lessonEvent?.name
-      lessonView.nameLabel.font = event.lessonEvent?.nameFont
-      lessonView.nameLabel.textColor = event.lessonEvent?.nameTextColor
-      lessonView.addressLabel.text = event.lessonEvent?.address
-      lessonView.addressLabel.font = event.lessonEvent?.addressFont
-      lessonView.addressLabel.textColor = event.lessonEvent?.addressTextColor
-      lessonView.imageView.image = event.lessonEvent?.avatar
-//    if let attributedText = event.attributedText {
-//      textView.attributedText = attributedText
-//    } else {
-//      textView.text = event.text
-//      textView.textColor = event.textColor
-//      textView.font = event.font
-//    }
-//    if let lineBreakMode = event.lineBreakMode {
-//      textView.textContainer.lineBreakMode = lineBreakMode
-//    }
-    descriptor = event
-    backgroundColor = event.backgroundColor
-    color = event.color
-    eventResizeHandles.forEach{
-      $0.borderColor = event.color
-      $0.isHidden = event.editedEvent == nil
+    public func updateWithDescriptor(event: EventDescriptor) {
+        lessonView.nameLabel.text = event.lessonEvent?.name
+        lessonView.nameLabel.font = event.lessonEvent?.nameFont
+        lessonView.nameLabel.textColor = event.lessonEvent?.nameTextColor
+        lessonView.addressLabel.text = event.lessonEvent?.address
+        lessonView.addressLabel.font = event.lessonEvent?.addressFont
+        lessonView.addressLabel.textColor = event.lessonEvent?.addressTextColor
+        event.lessonEvent?.avatarClosure(lessonView.imageView)
+        
+        descriptor = event
+        backgroundColor = event.backgroundColor
+        color = event.color
+        eventResizeHandles.forEach{
+            $0.borderColor = event.color
+            $0.isHidden = event.editedEvent == nil
+        }
+        drawsShadow = event.editedEvent != nil
+        setNeedsDisplay()
+        setNeedsLayout()
     }
-    drawsShadow = event.editedEvent != nil
-    setNeedsDisplay()
-    setNeedsLayout()
-  }
   
   public func animateCreation() {
     transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
@@ -237,8 +228,6 @@ private class LessonEventView: UIView {
             nameLabelBottomConstraint,
             nameLabel.trailingAnchor.constraint(greaterThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
         ])
-        
-        
     }
     
     private struct Constants {
