@@ -10,21 +10,28 @@ public final class TimelineContainerController: UIViewController {
         }
     }
   
-  public lazy var timeline = TimelineView()
-  public lazy var container: TimelineContainer = {
-    let view = TimelineContainer(timeline)
-    view.addSubview(timeline)
-    return view
-  }()
+    public lazy var timeline = TimelineView()
+    public lazy var container: TimelineContainer = {
+        let view = TimelineContainer(timeline)
+        view.addSubview(timeline)
+        view.alwaysBounceVertical = true
+        return view
+    }()
     var emtyDayView: EmptyDayView?
-  
-  public override func loadView() {
-    view = container
-  }
+    
+    public override func loadView() {
+        view = container
+    }
   
   public override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    container.contentSize = timeline.frame.size
+      let contentHeight: CGFloat = max(timeline.frame.height, container.frame.height)
+      let contentSize = CGSize(width: timeline.frame.width, height: contentHeight)
+      let currentContentSize = container.contentSize
+      if currentContentSize != contentSize {
+          container.contentSize = contentSize
+      }
+
       emtyDayView?.frame = self.view.bounds
     if let newOffset = pendingContentOffset {
       // Apply new offset only once the size has been determined
