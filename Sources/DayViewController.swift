@@ -1,19 +1,5 @@
 import UIKit
 
-// WARNING!: -- remove after debug (move to separate file(s))
-public protocol DayModelDescription: AnyObject {
-    var startHour: Int { get }
-    var endHour: Int { get }    
-    var isBusyDay: Bool { get }
-    var totalWorkingHours: Int { get }
-}
-
-public protocol DayModelDataSource: AnyObject {
-    func dayModel(for date: Date) -> DayModelDescription
-}
-//
-
-
 open class DayViewController: UIViewController, EventDataSource, DayViewDelegate, DayModelDataSource {
   public lazy var dayView: DayView = DayView()
   public var dataSource: EventDataSource? {
