@@ -150,14 +150,12 @@ public final class TimelineView: UIView {
   }
     
     func fullHeight() -> CGFloat {
-        var totalHours = 24
-        
         func height(for hours: Int) -> CGFloat {
             return style.verticalInset * 2 + style.verticalDiff * CGFloat(hours)
         }
         
         guard let dayModel = dayModelDataSource?.dayModel(for: date) else {
-            return height(for: totalHours)
+            return height(for: 24) // default value -- full day
         }
         
         return height(for: dayModel.totalWorkingHours)

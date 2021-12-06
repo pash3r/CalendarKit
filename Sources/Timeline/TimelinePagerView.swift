@@ -124,6 +124,7 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
   private func updateStyleOfTimelineContainer(controller: TimelineContainerController) {
     let container = controller.container
     let timeline = controller.timeline
+      controller.emtyDayView?.style = style.emtyDayStyle
     timeline.updateStyle(style)
     container.backgroundColor = style.backgroundColor
   }
@@ -162,6 +163,7 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
     timeline.calendar = calendar
     timeline.eventEditingSnappingBehavior = eventEditingSnappingBehavior
     timeline.date = date.dateOnly(calendar: calendar)
+//      timeline.style = style
     controller.container.delegate = self
     updateTimeline(timeline)
     return controller
