@@ -29,4 +29,5 @@ public protocol LessonEventProtocol: AnyObject {
     var addressTextColor: UIColor { get }
     var nameFont: UIFont { get }
     var nameTextColor: UIColor { get }
+    var lesson: Any { get }
 }
