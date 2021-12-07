@@ -163,7 +163,6 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
     timeline.calendar = calendar
     timeline.eventEditingSnappingBehavior = eventEditingSnappingBehavior
     timeline.date = date.dateOnly(calendar: calendar)
-//      timeline.style = style
     controller.container.delegate = self
     updateTimeline(timeline)
     return controller
@@ -342,7 +341,7 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
       timeline.setNeedsDisplay()
     }
   }
-
+    
   private func commitEditing() {
     if let currentTimeline = currentTimeline {
       let timeline = currentTimeline.timeline
@@ -479,23 +478,59 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
 
   // MARK: UIPageViewControllerDataSource
 
-  public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-    guard let containerController = viewController as? TimelineContainerController  else {return nil}
-    let previousDate = calendar.date(byAdding: .day, value: -1, to: containerController.timeline.date)!
-    let vc = configureTimelineController(date: previousDate)
-    let offset = (pageViewController.viewControllers?.first as? TimelineContainerController)?.container.contentOffset
-    vc.pendingContentOffset = offset
-    return vc
-  }
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        guard let containerController = viewController as? TimelineContainerController else {
+            return nil
+        }
+        
+        lazy var offset = (pageViewController.viewControllers?.first as? TimelineContainerController)?.container.contentOffset
+        
+        func makeSelectorController(with date: Date, offset: CGPoint?) -> UIViewController {
+            let result = configureTimelineController(date: date)
+            result.pendingContentOffset = offset
+            return result
+        }
+        
+        guard let startDate = state?.startDate else {
+            let previousDate = calendar.date(byAdding: .weekOfYear, value: -1, to: containerController.timeline.date)!
+            return makeSelectorController(with: previousDate, offset: offset)
+        }
+        
+        let currentControllerDate = containerController.timeline.date
+        if currentControllerDate == startDate {
+            return nil
+        }
+        
+        if currentControllerDate > startDate, let prevDate = calendar.date(byAdding: .weekOfYear, value: -1, to: currentControllerDate) {
+            return makeSelectorController(with: prevDate, offset: offset)
+        }
+          
+        return nil
+    }
 
-  public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-    guard let containerController = viewController as? TimelineContainerController  else {return nil}
-    let nextDate = calendar.date(byAdding: .day, value: 1, to: containerController.timeline.date)!
-    let vc = configureTimelineController(date: nextDate)
-    let offset = (pageViewController.viewControllers?.first as? TimelineContainerController)?.container.contentOffset
-    vc.pendingContentOffset = offset
-    return vc
-  }
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        guard let containerController = viewController as? TimelineContainerController else {
+            return nil
+        }
+        
+        let currentControllerDate = containerController.timeline.date
+        
+        guard let endDate = state?.endDate else {
+            return configureTimelineController(date: calendar.date(byAdding: .weekOfYear, value: 1, to: currentControllerDate)!)
+        }
+        
+        var nextController: UIViewController?
+        
+        let result = calendar.compare(currentControllerDate, to: endDate, toGranularity: .weekOfYear)
+        if case .orderedAscending = result, let nextDate = calendar.date(byAdding: .weekOfYear, value: 1, to: currentControllerDate) {
+            let controller = configureTimelineController(date: nextDate)
+            let offset = (pageViewController.viewControllers?.first as? TimelineContainerController)?.container.contentOffset
+            controller.pendingContentOffset = offset
+            nextController = controller
+        }
+        
+        return nextController
+    }
 
   // MARK: UIPageViewControllerDelegate
 
