@@ -22,9 +22,7 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
             (pagingViewController.viewControllers?.first as? DaySelectorController)?.dayModelDataSource
         }
         set {
-            pagingViewController.viewControllers?
-                .compactMap { $0 as? DaySelectorController }
-                .forEach { $0.dayModelDataSource = newValue }
+            reloadData { $0.dayModelDataSource = newValue }
         }
     }
 
@@ -82,6 +80,12 @@ public final class DayHeaderView: UIView, DaySelectorDelegate, DayViewStateUpdat
         new.delegate = self
         new.dayModelDataSource = dayModelDataSource
         return new
+    }
+    
+    private func reloadData(using closure: @escaping (DaySelectorController) -> Void) {
+        pagingViewController.viewControllers?
+            .compactMap { $0 as? DaySelectorController }
+            .forEach(closure)
     }
   
   private func beginningOfWeek(_ date: Date) -> Date {

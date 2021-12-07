@@ -69,7 +69,7 @@ public class DayView: UIView, TimelinePagerViewDelegate {
     }
   }
 
-    public var calendar: Calendar = Calendar(identifier: .iso8601)
+    public var calendar: Calendar = Calendar.current
 
   public var eventEditingSnappingBehavior: EventEditingSnappingBehavior {
     get {
@@ -82,7 +82,7 @@ public class DayView: UIView, TimelinePagerViewDelegate {
 
   private var style = CalendarStyle()
     
-    public init(calendar: Calendar = Calendar(identifier: .iso8601)) {
+    public init(calendar: Calendar = Calendar.current) {
         self.calendar = calendar
         self.dayHeaderView = DayHeaderView(calendar: calendar)
         self.timelinePagerView = TimelinePagerView(calendar: calendar)
@@ -160,9 +160,10 @@ public class DayView: UIView, TimelinePagerViewDelegate {
     timelinePagerView.scrollToFirstEventIfNeeded(animated: animated)
   }
 
-  public func reloadData() {
-    timelinePagerView.reloadData()
-  }
+    public func reloadData() {
+        dayHeaderView.dayModelDataSource = dayModelDataSource
+        timelinePagerView.reloadData()
+    }
   
   public func move(to date: Date) {
     state?.move(to: date)
