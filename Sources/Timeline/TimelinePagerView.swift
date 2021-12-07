@@ -491,8 +491,10 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
             return result
         }
         
+        let component: Calendar.Component = .weekday
+        
         guard let startDate = state?.startDate else {
-            let previousDate = calendar.date(byAdding: .weekOfYear, value: -1, to: containerController.timeline.date)!
+            let previousDate = calendar.date(byAdding: component, value: -1, to: containerController.timeline.date)!
             return makeSelectorController(with: previousDate, offset: offset)
         }
         
@@ -501,7 +503,7 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
             return nil
         }
         
-        if currentControllerDate > startDate, let prevDate = calendar.date(byAdding: .weekOfYear, value: -1, to: currentControllerDate) {
+        if currentControllerDate > startDate, let prevDate = calendar.date(byAdding: component, value: -1, to: currentControllerDate) {
             return makeSelectorController(with: prevDate, offset: offset)
         }
           
@@ -513,16 +515,17 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
             return nil
         }
         
+        let component: Calendar.Component = .weekday
         let currentControllerDate = containerController.timeline.date
         
         guard let endDate = state?.endDate else {
-            return configureTimelineController(date: calendar.date(byAdding: .weekOfYear, value: 1, to: currentControllerDate)!)
+            return configureTimelineController(date: calendar.date(byAdding: component, value: 1, to: currentControllerDate)!)
         }
         
         var nextController: UIViewController?
         
         let result = calendar.compare(currentControllerDate, to: endDate, toGranularity: .weekOfYear)
-        if case .orderedAscending = result, let nextDate = calendar.date(byAdding: .weekOfYear, value: 1, to: currentControllerDate) {
+        if case .orderedAscending = result, let nextDate = calendar.date(byAdding: component, value: 1, to: currentControllerDate) {
             let controller = configureTimelineController(date: nextDate)
             let offset = (pageViewController.viewControllers?.first as? TimelineContainerController)?.container.contentOffset
             controller.pendingContentOffset = offset
