@@ -43,7 +43,7 @@ open class EventView: UIView {
         lessonView.addressLabel.text = event.lessonEvent?.address
         lessonView.addressLabel.font = event.lessonEvent?.addressFont
         lessonView.addressLabel.textColor = event.lessonEvent?.addressTextColor
-        event.lessonEvent?.avatarClosure(lessonView.imageView)
+        event.lessonEvent?.avatarClosure(lessonView.imageView, event.lessonEvent?.avatarUrl)
         
         let now = Date()
         let isOverlayHidden = !(now > event.endDate)
