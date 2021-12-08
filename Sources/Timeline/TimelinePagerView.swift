@@ -523,16 +523,20 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
             return configureTimelineController(date: calendar.date(byAdding: component, value: 1, to: currentControllerDate)!)
         }
         
+        let comparison = calendar.compare(endDate, to: currentControllerDate, toGranularity: .weekday)
+        guard comparison != .orderedSame else {
+            return nil
+        }
+        
         var nextController: UIViewController?
         
-        let result = calendar.compare(currentControllerDate, to: endDate, toGranularity: .weekOfYear)
-        if case .orderedAscending = result, let nextDate = calendar.date(byAdding: component, value: 1, to: currentControllerDate) {
+        if let nextDate = calendar.date(byAdding: component, value: 1, to: currentControllerDate) {
             let controller = configureTimelineController(date: nextDate)
             let offset = (pageViewController.viewControllers?.first as? TimelineContainerController)?.container.contentOffset
             controller.pendingContentOffset = offset
             nextController = controller
         }
-        
+                
         return nextController
     }
 
