@@ -188,6 +188,7 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
     pagingViewController.children.forEach({ (controller) in
       if let controller = controller as? TimelineContainerController {
         self.updateTimeline(controller.timeline)
+          controller.dayModelDataSource = dayModelDataSource
       }
     })
   }
