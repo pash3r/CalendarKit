@@ -17,6 +17,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
   public var calendar = Calendar.autoupdatingCurrent {
     didSet {
       dateLabel.calendar = calendar
+        dateLabel.date = date
       updateState()
     }
   }
