@@ -135,9 +135,9 @@ public class DayView: UIView, TimelinePagerViewDelegate {
         timelinePagerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor).isActive = true
         timelinePagerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor).isActive = true
         timelinePagerView.topAnchor.constraint(equalTo: dayHeaderView.bottomAnchor).isActive = true
-        timelinePagerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        timelinePagerView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
-
+    
   public func updateStyle(_ newStyle: CalendarStyle) {
     style = newStyle
     dayHeaderView.updateStyle(style.header)

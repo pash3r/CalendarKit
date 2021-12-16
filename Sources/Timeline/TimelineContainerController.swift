@@ -22,10 +22,10 @@ public final class TimelineContainerController: UIViewController {
     public override func loadView() {
         view = container
     }
-  
+      
   public override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-      let contentHeight: CGFloat = max(timeline.frame.height, container.frame.height)
+      let contentHeight: CGFloat = max(timeline.frame.height, (container.frame.height - container.adjustedContentInset.bottom))
       let contentSize = CGSize(width: timeline.frame.width, height: contentHeight)
       let currentContentSize = container.contentSize
       if currentContentSize != contentSize {

@@ -50,7 +50,6 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
 
     override open func viewDidLoad() {
         super.viewDidLoad()
-        edgesForExtendedLayout = []
         view.tintColor = SystemColors.systemRed
         dataSource = self
         delegate = self        
@@ -64,7 +63,7 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
     super.viewDidAppear(animated)
     dayView.scrollToFirstEventIfNeeded()
   }
-
+    
   open override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
     super.willTransition(to: newCollection, with: coordinator)
     configureDayViewLayoutForHorizontalSizeClass(newCollection.horizontalSizeClass)
