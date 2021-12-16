@@ -66,9 +66,10 @@ public final class Event: EventDescriptor {
   
   /// Dynamic color that changes depending on the user interface style (dark / light)
   private func dynamicStandardBackgroundColor() -> UIColor {
-    let light = backgroundColorForLightTheme(baseColor: color)
-    let dark = backgroundColorForDarkTheme(baseColor: color)
-    return dynamicColor(light: light, dark: dark)
+//    let light = backgroundColorForLightTheme(baseColor: color)
+//    let dark = backgroundColorForDarkTheme(baseColor: color)
+//    return dynamicColor(light: light, dark: dark)
+      backgroundColor
   }
   
   /// Dynamic color that changes depending on the user interface style (dark / light)
