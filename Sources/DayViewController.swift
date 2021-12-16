@@ -91,6 +91,10 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
   open func eventsForDate(_ date: Date) -> [EventDescriptor] {
     return [Event]()
   }
+    
+    open func isBusy(date: Date) -> Bool {
+        false
+    }
 
   // MARK: - DayViewDelegate
 

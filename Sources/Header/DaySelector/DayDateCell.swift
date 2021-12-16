@@ -38,6 +38,12 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
             updateState()
         }
     }
+    
+    public var isEmpty: Bool = false {
+        didSet {
+            configure(with: dayModel)
+        }
+    }
 
   var style = DaySelectorStyle()
 
@@ -129,7 +135,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
             textColor = style.selectedTextColor
             borderColor = style.selectedBorderColor.cgColor
         } else {
-            let isBusyDay = model.isBusyDay
+            let isBusyDay = isEmpty
             bgColor = isBusyDay ? style.busyBgColor : style.emptyBgColor
             textColor = isBusyDay ? style.busyTextColor : style.emptyTextColor
             borderColor = (isBusyDay ? style.busyBorderColor : style.emptyBorderColor).cgColor

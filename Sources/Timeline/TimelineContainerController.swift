@@ -78,7 +78,7 @@ public final class TimelineContainerController: UIViewController {
             return
         }
         
-        let show = model.isBusyDay == false
+        let show = model.totalWorkingHours == 0
         showEmtyDayView(show)
     }
     

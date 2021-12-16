@@ -5,6 +5,7 @@ public protocol DaySelectorItemProtocol: AnyObject {
     var selected: Bool { get set }
     var calendar: Calendar { get set }
     var dayModel: DayModelDescription? { get set }
+    var isEmpty: Bool { get set }
     func updateStyle(_ newStyle: DaySelectorStyle)
 }
 
@@ -31,6 +32,7 @@ public final class DaySelector: UIView {
         items.forEach { (item) in
             item.calendar = calendar
             item.dayModel = dayModelDataSource?.dayModel(for: item.date)
+            item.isEmpty = dayModelDataSource?.isBusy(date: item.date) ?? false
         }
     }
 

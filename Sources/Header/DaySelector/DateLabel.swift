@@ -25,6 +25,8 @@ public final class DateLabel: UILabel, DaySelectorItemProtocol {
       animate()
     }
   }
+    
+    public var isEmpty: Bool = false
 
   private var style = DaySelectorStyle()
 
