@@ -395,9 +395,7 @@ public final class TimelineView: UIView {
         
         let eventMinY = attributes.frame.minY
         let isHidden = (eventMinY < 0) || (eventMinY > fullHeight())
-        // WARNING!: -- remove after debug (set isHidden to eventView)
-//        eventView.isHidden = isHidden
-        //
+        eventView.isHidden = isHidden
     }
   }
     
