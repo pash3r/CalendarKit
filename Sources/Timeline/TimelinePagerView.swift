@@ -154,18 +154,18 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
   }
 
   private func configureTimelineController(date: Date) -> TimelineContainerController {
-    let controller = TimelineContainerController()
+      let controller = TimelineContainerController()
+      updateStyleOfTimelineContainer(controller: controller)
+      let timeline = controller.timeline
+      timeline.longPressGestureRecognizer.addTarget(self, action: #selector(timelineDidLongPress(_:)))
+      timeline.delegate = self
+      timeline.calendar = calendar
+      timeline.eventEditingSnappingBehavior = eventEditingSnappingBehavior
+      timeline.date = date.dateOnly(calendar: calendar)
+      controller.container.delegate = self
       controller.dayModelDataSource = dayModelDataSource
-    updateStyleOfTimelineContainer(controller: controller)
-    let timeline = controller.timeline
-    timeline.longPressGestureRecognizer.addTarget(self, action: #selector(timelineDidLongPress(_:)))
-    timeline.delegate = self
-    timeline.calendar = calendar
-    timeline.eventEditingSnappingBehavior = eventEditingSnappingBehavior
-    timeline.date = date.dateOnly(calendar: calendar)
-    controller.container.delegate = self
-    updateTimeline(timeline)
-    return controller
+      updateTimeline(timeline)
+      return controller
   }
 
   private var initialContentOffset = CGPoint.zero
