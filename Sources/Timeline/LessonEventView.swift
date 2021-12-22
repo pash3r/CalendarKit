@@ -60,7 +60,7 @@ class LessonEventView: UIView {
         NSLayoutConstraint.activate([
             addressLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: Constants.topMargin),
             addressLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: Constants.horizontalMargin),
-            addressLabel.trailingAnchor.constraint(greaterThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
+            addressLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
             
             imageView.topAnchor.constraint(equalTo: addressLabel.bottomAnchor, constant: Constants.imageTopMargin),
             imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: Constants.horizontalMargin),
@@ -70,7 +70,7 @@ class LessonEventView: UIView {
             nameLabel.topAnchor.constraint(equalTo: addressLabel.bottomAnchor, constant: Constants.betweenLabelsMargin),
             nameLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: Constants.imageRightMargin),
             nameLabelBottomConstraint,
-            nameLabel.trailingAnchor.constraint(greaterThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
+            nameLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor, constant: -Constants.horizontalMargin),
             
             overlayView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             overlayView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
