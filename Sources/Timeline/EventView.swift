@@ -1,6 +1,13 @@
 import UIKit
 
+public protocol ShadowDrawable: AnyObject {
+    static func addShadow(to layer: CALayer, rect: CGRect, radiusValue: CGFloat, isDarkMode: Bool)
+    static func makeShadowPath(for rect: CGRect, radiusValue: CGFloat) -> CGPath
+}
+
 open class EventView: UIView {
+    public static var shadowHelper: ShadowDrawable.Type?
+    
   public var descriptor: EventDescriptor?
   public var color = SystemColors.label
 
@@ -9,6 +16,7 @@ open class EventView: UIView {
   }
 
     private let lessonView: LessonEventView = .init(frame: .zero)
+    private let contentView: EventContentView = .init(frame: .zero)
 
   /// Resize Handle views showing up when editing the event.
   /// The top handle has a tag of `0` and the bottom has a tag of `1`
@@ -24,17 +32,30 @@ open class EventView: UIView {
     configure()
   }
 
-  private func configure() {
-      layer.cornerRadius = 6
-      layer.masksToBounds = true
-    color = tintColor
-    addSubview(lessonView)
-    
-    for (idx, handle) in eventResizeHandles.enumerated() {
-      handle.tag = idx
-      addSubview(handle)
+    private func configure() {
+        color = tintColor
+        
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: self.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            contentView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+        ])
+        
+        contentView.addSubview(lessonView)
+        
+        for (idx, handle) in eventResizeHandles.enumerated() {
+            handle.tag = idx
+            addSubview(handle)
+        }
+        
+        contentView.layer.cornerRadius = Constants.cornerRadius
+        lessonView.layer.cornerRadius = contentView.layer.cornerRadius
+        contentView.clipsToBounds = true
     }
-  }
 
     public func updateWithDescriptor(event: EventDescriptor) {
         lessonView.nameLabel.text = event.lessonEvent?.name
@@ -50,13 +71,17 @@ open class EventView: UIView {
         lessonView.overlayView.isHidden = isOverlayHidden
         
         descriptor = event
-        backgroundColor = event.backgroundColor
-        color = event.color
+        contentView.backgroundColor = event.backgroundColor
+        lessonView.backgroundColor = contentView.backgroundColor
+        contentView.stripeWidth = Constants.leftStripeWidth
+        contentView.stripeColor = event.color
+        contentView.stripeAlpha = lessonView.overlayView.isHidden ? 1.0 : 0.5
+        
         eventResizeHandles.forEach{
             $0.borderColor = event.color
             $0.isHidden = event.editedEvent == nil
         }
-        drawsShadow = event.editedEvent != nil
+                
         setNeedsDisplay()
         setNeedsLayout()
     }
@@ -92,28 +117,7 @@ open class EventView: UIView {
     return super.hitTest(point, with: event)
   }
 
-  override open func draw(_ rect: CGRect) {
-    super.draw(rect)
-    guard let context = UIGraphicsGetCurrentContext() else {
-      return
-    }
-    context.interpolationQuality = .none
-    context.saveGState()
-      let alpha: CGFloat = lessonView.overlayView.isHidden ? 1.0 : 0.5
-      context.setStrokeColor(color.withAlphaComponent(alpha).cgColor)
-    context.setLineWidth(Constants.leftStripeWidth * 2)
-//    context.translateBy(x: 0, y: 0.5)
-    let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
-    let x: CGFloat = leftToRight ? 0 : frame.width - 1  // 1 is the line width
-    let y: CGFloat = 0
-    context.beginPath()
-    context.move(to: CGPoint(x: x, y: y))
-    context.addLine(to: CGPoint(x: x, y: (bounds).height))
-    context.strokePath()
-    context.restoreGState()
-  }
-
-  private var drawsShadow = false
+  private var drawsShadow = true
 
   override open func layoutSubviews() {
     super.layoutSubviews()
@@ -144,34 +148,50 @@ open class EventView: UIView {
       last?.frame = CGRect(origin: CGPoint(x: layoutMargins.left, y: height - yPad - radius),
                            size: size)
       
-      if drawsShadow {
-          applySketchShadow(alpha: 0.13,
-                            blur: 10)
+      if drawsShadow, let shadowHelper = Self.shadowHelper {
+          let rect = bounds
+          let cornerRadius = Constants.cornerRadius
+          
+          shadowHelper.addShadow(to: layer,
+                                 rect: rect,
+                                 radiusValue: cornerRadius,
+                                 isDarkMode: traitCollection.userInterfaceStyle == .dark)
+          layer.shadowPath = shadowHelper.makeShadowPath(for: rect, radiusValue: cornerRadius)
       }
   }
 
-  private func applySketchShadow(
-    color: UIColor = .black,
-    alpha: Float = 0.5,
-    x: CGFloat = 0,
-    y: CGFloat = 2,
-    blur: CGFloat = 4,
-    spread: CGFloat = 0)
-  {
-    layer.shadowColor = color.cgColor
-    layer.shadowOpacity = alpha
-    layer.shadowOffset = CGSize(width: x, height: y)
-    layer.shadowRadius = blur / 2.0
-    if spread == 0 {
-      layer.shadowPath = nil
-    } else {
-      let dx = -spread
-      let rect = bounds.insetBy(dx: dx, dy: dx)
-      layer.shadowPath = UIBezierPath(rect: rect).cgPath
-    }
-  }
-    
     private struct Constants {
         static let leftStripeWidth: CGFloat = 4
+        static let cornerRadius: CGFloat = 6
     }
+    
+}
+
+private class EventContentView: UIView {
+    
+    var stripeAlpha: CGFloat = 1
+    var stripeColor: UIColor = .purple
+    var stripeWidth: CGFloat = 1
+    
+    override open func draw(_ rect: CGRect) {
+        super.draw(rect)
+        
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
+        context.interpolationQuality = .none
+        context.saveGState()
+        context.setStrokeColor(stripeColor.withAlphaComponent(stripeAlpha).cgColor)
+        context.setLineWidth(stripeWidth * 2)
+
+        let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
+        let x: CGFloat = leftToRight ? 0 : frame.width - stripeWidth
+        let y: CGFloat = 0
+        context.beginPath()
+        context.move(to: CGPoint(x: x, y: y))
+        context.addLine(to: CGPoint(x: x, y: (bounds).height))
+        context.strokePath()
+        context.restoreGState()
+    }
+    
 }
