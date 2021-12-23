@@ -249,8 +249,8 @@ public final class TimelineView: UIView {
                       NSAttributedString.Key.foregroundColor: self.style.timeColor,
                       NSAttributedString.Key.font: style.font] as [NSAttributedString.Key : Any]
 
-    let scale = UIScreen.main.scale
-    let hourLineHeight = 1 / scale
+      let scale = UIScreen.main.scale
+      let hourLineHeight = Constants.hourLineHeight / scale
 
     let center: CGFloat
     if Int(scale) % 2 == 0 {
@@ -372,33 +372,32 @@ public final class TimelineView: UIView {
     }
   }
 
-  private func layoutEvents() {
-    if eventViews.isEmpty { return }
-    
-    for (idx, attributes) in regularLayoutAttributes.enumerated() {
-      let descriptor = attributes.descriptor
-      let eventView = eventViews[idx]
-      eventView.frame = attributes.frame
+    private func layoutEvents() {
+        if eventViews.isEmpty { return }
         
-      var x: CGFloat
-      if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
-        x = bounds.width - attributes.frame.minX - attributes.frame.width
-      } else {
-        x = attributes.frame.minX
-      }
-        
-      eventView.frame = CGRect(x: x,
-                               y: attributes.frame.minY,
-                               width: attributes.frame.width,
-                               height: attributes.frame.height - style.eventGap)
-      eventView.updateWithDescriptor(event: descriptor)
-        
-        let eventMinY = attributes.frame.minY
-        let isHidden = (eventMinY < 0) || (eventMinY > fullHeight())
-        eventView.isHidden = isHidden
+        for (idx, attributes) in regularLayoutAttributes.enumerated() {
+            let descriptor = attributes.descriptor
+            let eventView = eventViews[idx]
+            eventView.frame = attributes.frame
+            
+            var x: CGFloat
+            if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
+                x = bounds.width - attributes.frame.minX - attributes.frame.width
+            } else {
+                x = attributes.frame.minX
+            }
+            
+            eventView.frame = CGRect(x: x,
+                                     y: attributes.frame.minY,
+                                     width: attributes.frame.width,
+                                     height: attributes.frame.height - style.eventGap)
+            eventView.updateWithDescriptor(event: descriptor)
+            
+            let eventMinY = attributes.frame.minY
+            let isHidden = (eventMinY < 0) || (eventMinY > fullHeight())
+            eventView.isHidden = isHidden
+        }
     }
-  }
-    
     
   private func recalculateEventLayout() {
 
@@ -453,14 +452,14 @@ public final class TimelineView: UIView {
       for overlappingEvents in groupsOfEvents {
           let totalCount = CGFloat(overlappingEvents.count)
           for (index, event) in overlappingEvents.enumerated() {
-              let startY = dateToY(event.descriptor.datePeriod.lowerBound)
+              let startY = dateToY(event.descriptor.datePeriod.lowerBound) + Constants.hourLineHeight
               let endY = dateToY(event.descriptor.datePeriod.upperBound)
               let floatIndex = CGFloat(index)
               // FIXME: leadingInset + 29 because originally it was 53. It lays out from
               // left side but it doesn't take into account that time label
               // also has some width. And for `equalWidth` (-5) because of
               // the above + 29 :(
-              let x = style.leadingInset + 32 + style.separatorInset + floatIndex / totalCount * calendarWidth
+              let x = style.leadingInset + 31 + style.separatorInset + floatIndex / totalCount * calendarWidth
               let equalWidth = (calendarWidth - x - style.trailingInset) / totalCount
               event.frame = CGRect(x: x, y: startY, width: equalWidth, height: endY - startY)
           }
@@ -555,4 +554,8 @@ public final class TimelineView: UIView {
     let endRange = calendar.date(byAdding: .minute, value: splitMinuteInterval, to: beginningRange)!
     return beginningRange ... endRange
   }
+    
+    private struct Constants {
+        static let hourLineHeight: CGFloat = 1
+    }
 }
