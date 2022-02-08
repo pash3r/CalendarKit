@@ -47,8 +47,16 @@ public class DayView: UIView, TimelinePagerViewDelegate {
     return timelinePagerView.timelineScrollOffset
   }
 
-  private static let headerVisibleHeight: CGFloat = 50
-  public var headerHeight: CGFloat = headerVisibleHeight
+    private static let headerVisibleHeight: CGFloat = 50
+    public var headerHeight: CGFloat = headerVisibleHeight
+    public var dayViewTopMargin: CGFloat = 0 {
+        didSet {
+            dayViewTopConstraint?.constant = dayViewTopMargin
+            setNeedsLayout()
+        }
+    }
+    
+    private var dayViewTopConstraint: NSLayoutConstraint?
 
   public var autoScrollToFirstEvent: Bool {
     get {
@@ -127,7 +135,9 @@ public class DayView: UIView, TimelinePagerViewDelegate {
         
         dayHeaderView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor).isActive = true
         dayHeaderView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor).isActive = true
-        dayHeaderView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+        dayViewTopConstraint = dayHeaderView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: dayViewTopMargin)
+        dayViewTopConstraint?.isActive = true
+        
         let heightConstraint = dayHeaderView.heightAnchor.constraint(equalToConstant: headerHeight)
         heightConstraint.priority = .defaultLow
         heightConstraint.isActive = true
