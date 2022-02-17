@@ -10,6 +10,7 @@ import Foundation
 public protocol DayModelDescription: AnyObject {
     var startHour: Int { get }
     var endHour: Int { get }
+    var lastHourForTimeline: Int { get }
     var totalWorkingHours: Int { get }
 }
 

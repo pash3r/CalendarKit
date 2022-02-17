@@ -158,7 +158,7 @@ public final class TimelineView: UIView {
             return height(for: 24) // default value -- full day
         }
         
-        return height(for: dayModel.totalWorkingHours)
+        return height(for: dayModel.totalWorkingHours + 1) // see DayModel comment
     }
   
   // MARK: - Event Handling
@@ -279,7 +279,7 @@ public final class TimelineView: UIView {
     
       let times: [String]
       if let dayModel = dayModelDataSource?.dayModel(for: date) {
-          times = TimeStringsFactory().make24hStrings(with: dayModel.startHour, endHour: dayModel.endHour)
+          times = TimeStringsFactory().make24hStrings(with: dayModel.startHour, endHour: dayModel.lastHourForTimeline)
       } else {
           times = self.times
       }
