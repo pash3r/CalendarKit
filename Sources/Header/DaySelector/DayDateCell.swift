@@ -25,7 +25,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
 
     public var selected: Bool = false {
         didSet {
-            configure(with: dayModel)
+            configureStyles()
         }
     }
     
@@ -41,7 +41,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
     
     public var isEmpty: Bool = false {
         didSet {
-            configure(with: dayModel)
+            configureStyles()
         }
     }
 
@@ -95,18 +95,18 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
     private func updateState() {
         dateLabel.updateState()
         updateDayLabel()
-        configure(with: dayModel)
+        configureStyles()
         setNeedsLayout()
     }
-
-  private func updateDayLabel() {
-    let daySymbols = calendar.shortWeekdaySymbols
-    let weekendMask = [true] + [Bool](repeating: false, count: 5) + [true]
-    var weekDays = Array(zip(daySymbols, weekendMask))
-    weekDays.shift(calendar.firstWeekday - 1)
-    let weekDay = component(component: .weekday, from: date)
-    dayLabel.text = daySymbols[weekDay - 1]
-  }
+    
+    private func updateDayLabel() {
+        let daySymbols = calendar.shortWeekdaySymbols
+        let weekendMask = [true] + [Bool](repeating: false, count: 5) + [true]
+        var weekDays = Array(zip(daySymbols, weekendMask))
+        weekDays.shift(calendar.firstWeekday - 1)
+        let weekDay = component(component: .weekday, from: date)
+        dayLabel.text = (daySymbols[weekDay - 1]).lowercased()
+    }
 
   private func component(component: Calendar.Component, from date: Date) -> Int {
     return calendar.component(component, from: date)
@@ -120,11 +120,7 @@ public final class DayDateCell: UIView, DaySelectorItemProtocol {
     return false
   }
     
-    private func configure(with model: DayModelDescription?) {
-        guard let model = model else {
-            return
-        }
-        
+    private func configureStyles() {
         let bgColor: UIColor
         let textColor: UIColor
         let borderColor: CGColor
