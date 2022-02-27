@@ -24,6 +24,7 @@ class LessonEventView: UIView {
     let imageView: UIImageView = {
         let result = UIImageView()
         result.translatesAutoresizingMaskIntoConstraints = false
+        result.contentMode = .scaleAspectFill
         return result
     }()
     
