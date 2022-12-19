@@ -1,6 +1,13 @@
 import UIKit
 
 open class DayViewController: UIViewController, EventDataSource, DayViewDelegate, DayModelDataSource {
+    public func getPlaceholderView(for date: Date?) -> UIView? {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .red
+        return view
+    }
+    
   public lazy var dayView: DayView = DayView()
   public var dataSource: EventDataSource? {
     get {
