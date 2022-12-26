@@ -73,8 +73,9 @@ public final class TimelineContainerController: UIViewController {
     }
 
     private func showEmptyViewIfNecessary() {
+        showEmptyDayView(false, date: timeline.date)
+        
         guard let model = dayModelDataSource?.dayModel(for: timeline.date) else {
-            showEmptyDayView(false, date: timeline.date)
             return
         }
         
