@@ -124,7 +124,7 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
   private func updateStyleOfTimelineContainer(controller: TimelineContainerController) {
     let container = controller.container
     let timeline = controller.timeline
-      controller.emtyDayView?.style = style.emtyDayStyle
+//      controller.emptyDayView?.style = style.emtyDayStyle
     timeline.updateStyle(style)
     container.backgroundColor = style.backgroundColor
   }

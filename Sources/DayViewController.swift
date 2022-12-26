@@ -1,6 +1,7 @@
 import UIKit
 
 open class DayViewController: UIViewController, EventDataSource, DayViewDelegate, DayModelDataSource {
+    
   public lazy var dayView: DayView = DayView()
   public var dataSource: EventDataSource? {
     get {
@@ -141,6 +142,10 @@ open class DayViewController: UIViewController, EventDataSource, DayViewDelegate
     // MARK: - DayModelDataSource
     
     open func dayModel(for date: Date) -> DayModelDescription {
+        fatalError("should be overridden")
+    }
+    
+    open func getPlaceholderView(for date: Date?) -> UIView? {
         fatalError("should be overridden")
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public protocol DayModelDescription: AnyObject {
     var startHour: Int { get }
@@ -16,5 +17,6 @@ public protocol DayModelDescription: AnyObject {
 
 public protocol DayModelDataSource: AnyObject {
     func dayModel(for date: Date) -> DayModelDescription
+    func getPlaceholderView(for date: Date?) -> UIView?
     func isBusy(date: Date) -> Bool
 }

@@ -17,7 +17,7 @@ public final class TimelineContainerController: UIViewController {
         view.alwaysBounceVertical = true
         return view
     }()
-    var emtyDayView: EmptyDayView?
+    var emptyDayView: UIView?
     
     public override func loadView() {
         view = container
@@ -32,7 +32,7 @@ public final class TimelineContainerController: UIViewController {
           container.contentSize = contentSize
       }
 
-      emtyDayView?.frame = self.view.bounds
+      emptyDayView?.frame = self.view.bounds
     if let newOffset = pendingContentOffset {
       // Apply new offset only once the size has been determined
       if view.bounds != .zero {
@@ -43,43 +43,43 @@ public final class TimelineContainerController: UIViewController {
     }
   }
     
-    private func makeEmtyDayView() -> EmptyDayView {
-        let result = EmptyDayView(frame: .zero)
-        result.translatesAutoresizingMaskIntoConstraints = false
-        result.style = timeline.style.emtyDayStyle
+    private func makeEmptyDayView(_ date: Date?) -> UIView? {
+        let result = dayModelDataSource?.getPlaceholderView(for: date)
+        result?.translatesAutoresizingMaskIntoConstraints = false
+//        result?.style = timeline.style.emtyDayStyle
         return result
     }
     
-    private func showEmtyDayView(_ show: Bool) {
+    private func showEmptyDayView(_ show: Bool, date: Date?) {
         guard show else {
-            emtyDayView?.removeFromSuperview()
-            emtyDayView = nil
+            emptyDayView?.removeFromSuperview()
+            emptyDayView = nil
             return
         }
         
-        var emtyDayView: EmptyDayView! = self.emtyDayView
-        if emtyDayView == nil {
-            emtyDayView = makeEmtyDayView()
-            self.emtyDayView = emtyDayView
+        var emptyDayView: UIView! = self.emptyDayView
+        if emptyDayView == nil {
+            emptyDayView = makeEmptyDayView(date)
+            self.emptyDayView = emptyDayView
         }
         
-        view.addSubview(emtyDayView)
+        view.addSubview(emptyDayView)
         NSLayoutConstraint.activate([
-            emtyDayView.topAnchor.constraint(equalTo: view.topAnchor),
-            emtyDayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emtyDayView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            emtyDayView.heightAnchor.constraint(equalTo: view.heightAnchor)
+            emptyDayView.topAnchor.constraint(equalTo: view.topAnchor),
+            emptyDayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emptyDayView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            emptyDayView.heightAnchor.constraint(equalTo: view.heightAnchor)
         ])
     }
 
     private func showEmptyViewIfNecessary() {
         guard let model = dayModelDataSource?.dayModel(for: timeline.date) else {
-            showEmtyDayView(false)
+            showEmptyDayView(false, date: timeline.date)
             return
         }
         
         let show = model.totalWorkingHours == 0
-        showEmtyDayView(show)
+        showEmptyDayView(show, date: timeline.date)
     }
     
 }
